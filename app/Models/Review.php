@@ -13,6 +13,7 @@ class Review extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'book_id',
         'rating',
         'comment',
@@ -20,7 +21,7 @@ class Review extends Model
 
     public function likes(): HasMany
     {
-        return $this->hasMany(Like::class);
+        return $this->hasMany(ReviewLike::class);
     }
 
     public function user(): BelongsTo
@@ -33,7 +34,7 @@ class Review extends Model
         return $this->belongsTo(Book::class);
     }
 
-    public function likedUsers(): BelongsToMany
+    public function likedByUsers(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'review_likes');
     }
