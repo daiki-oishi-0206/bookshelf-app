@@ -53,13 +53,13 @@ class ReviewController extends Controller
 
         return redirect()
             ->route('books.show', $review->book)
-            ->with('success', 'レビューを更新しました。');
+            ->with('success', 'レビューを更新しました');
     }
 
     public function destroy(Review $review)
     {
         $review->delete();
 
-        return back()->with('success', 'レビューを削除しました。');
+        return back()->with('success', 'レビューを削除しました');
     }
 }

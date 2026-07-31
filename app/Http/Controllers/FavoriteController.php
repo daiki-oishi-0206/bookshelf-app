@@ -11,9 +11,14 @@ use App\Models\Book;
 class FavoriteController extends Controller
 {
     public function index(): View
-        {
-            return View('favorite.index');
-        }
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        $books = $user->favoriteBooks()->paginate(10);
+
+        return view('favorites.index', compact('books'));
+    }
 
     public function toggle(Book $book): RedirectResponse
     {
@@ -23,11 +28,14 @@ class FavoriteController extends Controller
         if ($user->favoriteBooks()->where('book_id', $book->id)->exists()) {
             $user->favoriteBooks()->detach($book->id);
 
-            return back()->with('success', 'お気に入りから削除しました。');
+            return back()->with('success', 'お気に入りから削除しました');
         }
 
         $user->favoriteBooks()->attach($book->id);
 
-        return back()->with('success', 'お気に入りに追加しました。');
+        return back()->with('success', 'お気に入りに追加しました');
     }
+
+
+
 }
