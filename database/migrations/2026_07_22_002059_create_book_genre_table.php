@@ -11,21 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('reviews', function (Blueprint $table) {
+        Schema::create('book_genre', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('book_id')->constrained()->cascadeOnDelete();
-            $table->unsignedTinyInteger('rating');
-            $table->text('comment');
+            $table->foreignId('genre_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
+
+            $table->unique(['book_id', 'genre_id']);
         });
     }
-    
+
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('reviews');
+        Schema::dropIfExists('book_genre');
     }
 };
