@@ -30,4 +30,3 @@ class BookResource extends JsonResource
 }
 
 
-// GenreResource,BookResource実装済み
