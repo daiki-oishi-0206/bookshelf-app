@@ -8,6 +8,7 @@ use App\Http\Requests\Api\V1\IndexBookRequest;
 use App\Http\Resources\Api\V1\BookResource;
 use App\Models\Book;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use App\Http\Resources\Api\V1\BookDetailResource;
 
 class BookController extends Controller
 {
@@ -54,9 +55,9 @@ class BookController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Book $book): BookDetailResource
     {
-        //
+        
     }
 
     /**

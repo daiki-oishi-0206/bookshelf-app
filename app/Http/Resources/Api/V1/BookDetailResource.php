@@ -5,7 +5,7 @@ namespace App\Http\Resources\Api\V1;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class BookResource extends JsonResource
+class BookDetailResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -18,13 +18,19 @@ class BookResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'author' => $this->author,
+            'isbn' => $this->isbn,
+            'published_date' => $this->published_date,
+            'description' => $this->description,
 
             'genres' => GenreResource::collection(
                 $this->whenLoaded('genres')
             ),
 
-            'average_rating' => $this->reviews_avg_rating,
-            'review_count' => $this->reviews_count,
+            'reviews' => ReviewResource::collection(
+                $this->whenLoaded('reviews')
+            ),
+
         ];
     }
 }
+
