@@ -57,7 +57,14 @@ class BookController extends Controller
      */
     public function show(Book $book): BookDetailResource
     {
-        
+        $book->load([
+            'genres',
+            'reviews.user',
+        ]);
+
+        $book->reviews->loadCount('likedByUsers');
+
+        return new BookDetailResource($book);
     }
 
     /**
