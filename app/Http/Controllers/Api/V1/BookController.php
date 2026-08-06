@@ -51,9 +51,12 @@ class BookController extends Controller
      */
     public function store(StoreBookRequest $request)
     {
-        $book = Book::create($request->validated());
+        $data = $request->validated();
+        $data['user_id'] = 1;
+        //Sanctum実装後はAuth::id()へ変更
+        $book = Book::create($data);
 
-        $book->genres()->attach($request->genres);
+        $book->genres()->attach($data['genres']);
 
         return response('', 201);
 
