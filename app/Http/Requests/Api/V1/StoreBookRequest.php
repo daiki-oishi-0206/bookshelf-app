@@ -52,4 +52,3 @@ class StoreBookRequest extends FormRequest
     }
 }
 
-// genre_idに変更(webのほうも)

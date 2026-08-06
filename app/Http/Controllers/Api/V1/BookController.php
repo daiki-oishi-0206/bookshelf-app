@@ -9,6 +9,8 @@ use App\Http\Resources\Api\V1\BookResource;
 use App\Models\Book;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use App\Http\Resources\Api\V1\BookDetailResource;
+use App\Http\Requests\Api\V1\StoreBookRequest;
+use GuzzleHttp\Psr7\Response;
 
 class BookController extends Controller
 {
@@ -47,9 +49,14 @@ class BookController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreBookRequest $request)
     {
-        //
+        $book = Book::create($request->validated());
+
+        $book->genres()->attach($request->genres);
+
+        return response('', 201);
+
     }
 
     /**
