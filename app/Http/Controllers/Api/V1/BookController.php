@@ -10,6 +10,7 @@ use App\Models\Book;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use App\Http\Resources\Api\V1\BookDetailResource;
 use App\Http\Requests\Api\V1\StoreBookRequest;
+use App\Http\Requests\Api\V1\UpdateBookRequest;
 use GuzzleHttp\Psr7\Response;
 
 class BookController extends Controller
@@ -80,9 +81,14 @@ class BookController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateBookRequest $request, Book $book)
     {
-        //
+        $data = $request->validated();
+        $book->update($data);
+
+        $book->genres()->sync($request->genres);
+
+        return response('', 200);
     }
 
     /**
