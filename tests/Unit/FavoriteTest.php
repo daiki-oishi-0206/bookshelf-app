@@ -1,13 +1,11 @@
 <?php
 
-namespace Tests\Unit\Models;
+namespace Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class ReviewTest extends TestCase
+class FavoriteTest extends TestCase
 {
-    use RefreshDatabase;
     /**
      * A basic unit test example.
      */

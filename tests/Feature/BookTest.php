@@ -8,6 +8,7 @@ use Tests\TestCase;
 
 class BookTest extends TestCase
 {
+    use RefreshDatabase;
     /**
      * A basic feature test example.
      */
@@ -19,4 +20,3 @@ class BookTest extends TestCase
     }
 }
 
-// テストファイル作成まで完了
