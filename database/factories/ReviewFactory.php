@@ -3,6 +3,8 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Models\User;
+use App\Models\Book;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Review>
@@ -17,7 +19,10 @@ class ReviewFactory extends Factory
     public function definition(): array
     {
         return [
-            'rating' => fake()->numberBetween(3,5),
+            'user_id' => User::factory(),
+            'book_id' => Book::factory(),
+            'rating' => fake()->numberBetween(1, 5),
+            'comment' => fake()->paragraph(),
         ];
     }
 }

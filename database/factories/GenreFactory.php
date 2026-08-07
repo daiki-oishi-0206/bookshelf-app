@@ -17,7 +17,13 @@ class GenreFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'name' => fake()->randomElement([
+                '小説',
+                'ビジネス',
+                '技術書',
+                '自己啓発',
+                'エッセイ',
+            ]),
         ];
     }
 }

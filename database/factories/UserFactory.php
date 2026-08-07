@@ -42,3 +42,5 @@ class UserFactory extends Factory
         ]);
     }
 }
+
+// Factoryまで編集完了  次はTest実装
