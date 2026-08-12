@@ -12,10 +12,12 @@ class RankingTest extends TestCase
     /**
      * A basic feature test example.
      */
-    public function test_example(): void
+    public function test_未ログインでランキング画面にアクセスできる(): void
     {
-        $response = $this->get('/');
+        $response = $this->get('/ranking');
 
         $response->assertStatus(200);
     }
 }
+
+// 各ページのアクセステスト実装
