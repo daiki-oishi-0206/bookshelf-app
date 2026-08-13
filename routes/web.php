@@ -39,7 +39,7 @@ Route::middleware('auth')->group(function () {
         ->name('books.destroy');
 
 
-    Route::get('/favorite', [FavoriteController::class, 'index'])
+    Route::get('/favorites', [FavoriteController::class, 'index'])
         ->name('favorites.index');
     Route::post('/books/{book}/favorite', [FavoriteController::class, 'toggle'])
         ->name('favorites.toggle');

@@ -1,20 +1,20 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Access;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-class AuthTest extends TestCase
+class RankingTest extends TestCase
 {
     use RefreshDatabase;
     /**
      * A basic feature test example.
      */
-    public function test_example(): void
+    public function test_未ログインでランキング画面にアクセスできる(): void
     {
-        $response = $this->get('/');
+        $response = $this->get('/ranking');
 
         $response->assertStatus(200);
     }

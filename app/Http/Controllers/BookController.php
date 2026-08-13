@@ -55,6 +55,8 @@ class BookController extends Controller
 
     public function edit(Book $book): View
     {
+        $this->authorize('update', $book);
+        
         $genres = Genre::all();
 
         return view('books.edit', compact('book', 'genres'));
@@ -62,6 +64,8 @@ class BookController extends Controller
 
     public function update(UpdateBookRequest $request, Book $book): RedirectResponse
     {
+        $this->authorize('update', $book);
+
         $book->update([
             'title' => $request->title,
             'author' => $request->author,

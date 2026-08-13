@@ -41,11 +41,15 @@ class ReviewController extends Controller
 
     public function edit(Review $review): View
     {
+        $this->authorize('update', $review);
+        
         return view('reviews.edit', compact('review'));
     }
 
     public function update(UpdateReviewRequest $request, Review $review)
     {
+        $this->authorize('update', $review);
+
         $review->update([
             'rating' => $request->rating,
             'comment' => $request->comment,
