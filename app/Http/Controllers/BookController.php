@@ -75,6 +75,8 @@ class BookController extends Controller
             'image_url' => $request->image_url,
         ]);
 
+        $book->genres()->sync($request->genres);
+
         return redirect()
             ->route('books.show', $book)
             ->with('success', '書籍を更新しました');
@@ -82,6 +84,8 @@ class BookController extends Controller
 
     public function destroy(Book $book): RedirectResponse
     {
+        abort_unless($book->user_id === Auth::id(), 403);
+        
         $book->delete();
 
         return redirect()
