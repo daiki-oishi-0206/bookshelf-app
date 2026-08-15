@@ -77,3 +77,4 @@ Route::get('/books/{book}', [BookController::class, 'show'])
 
 Route::get('/ranking', [RankingController::class, 'index'])
     ->name('ranking.index');
+    

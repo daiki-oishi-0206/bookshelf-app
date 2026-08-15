@@ -62,8 +62,11 @@ class ReviewController extends Controller
 
     public function destroy(Review $review)
     {
+        abort_unless($review->user_id === auth()->id(), 403);
         $review->delete();
 
-        return back()->with('success', 'レビューを削除しました');
+        return redirect()
+            ->route('books.show', $review->book)
+            ->with('success', 'レビューを削除しました');
     }
 }
