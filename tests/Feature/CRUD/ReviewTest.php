@@ -128,6 +128,26 @@ class ReviewTest extends TestCase
         }
     }
 
+    public function test_未ログインでレビューを投稿できない(): void
+    {
+        $book = Book::factory()->create();
+
+        $data = [
+            'rating' => 5,
+            'comment' => '面白い本でした',
+        ];
+
+        $response = $this->post("/books/{$book->id}/review", $data);
+
+        $response->assertRedirect('/login');
+
+        $this->assertDatabaseMissing('reviews', [
+            'book_id' => $book->id,
+            'rating' => 5,
+            'comment' => '面白い本でした',
+        ]);
+    }
+
     public function test_評価を変更してレビューを編集できる(): void
     {
         $user = User::factory()->create();
@@ -264,6 +284,34 @@ class ReviewTest extends TestCase
 
             $response->assertSessionHasErrors($case['errors']);
         }
+    }
+
+    public function test_未ログインでレビューを編集できない(): void
+    {
+        $user = User::factory()->create();
+        $book = Book::factory()->create();
+
+        $review = Review::factory()->create([
+            'user_id' => $user->id,
+            'book_id' => $book->id,
+            'rating' => 3,
+            'comment' => NULL,
+        ]);
+
+        $data = [
+            'rating' => 5,
+            'comment' => '面白い本でした',
+        ];
+
+        $response = $this->put("/reviews/{$review->id}", $data);
+
+        $response->assertRedirect('/login');
+
+        $this->assertDatabaseHas('reviews', [
+            'id' => $review->id,
+            'rating' => 3,
+            'comment' => NULL,
+        ]);
     }
 
     public function test_自分が投稿したレビューを削除できる(): void

@@ -161,6 +161,27 @@ class BookTest extends TestCase
         }
     }
 
+    public function test_未ログインで書籍を登録できない(): void
+    {
+        $data = [
+            'title' => 'テスト書籍',
+            'author' => 'テスト著者',
+            'isbn' => '9781234567890',
+            'published_date' => '2026-01-01',
+            'description' => null,
+            'image_url' => null,
+            'genres' => [],
+        ];
+
+        $response = $this->post('/books', $data);
+
+        $response->assertRedirect('/login');
+
+        $this->assertDatabaseMissing('books', [
+            'title' => 'テスト書籍',
+            'isbn' => '9781234567890',
+        ]);
+    }
 
 
     public function test_必須項目を入力して書籍を更新できる(): void
@@ -370,6 +391,34 @@ class BookTest extends TestCase
 
             $response->assertSessionHasErrors($case['errors']);
         }
+    }
+
+
+    public function test_未ログインで書籍を更新できない(): void
+    {
+        $user = User::factory()->create();
+
+        $book = Book::factory()->create([
+            'user_id' => $user->id,
+        ]);
+
+        $data = [
+            'title' => '更新後タイトル',
+            'author' => '更新後著者',
+            'isbn' => $book->isbn,
+            'published_date' => '2026-02-01',
+            'description' => null,
+            'image_url' => null,
+            'genres' => [],
+        ];
+
+        $response = $this->put("/books/{$book->id}", $data);
+
+        $response->assertRedirect('/login');
+
+        $this->assertDatabaseMissing('books', [
+            'title' => '更新後タイトル',
+        ]);
     }
 
     public function test_自分が登録した書籍を削除できる(): void
