@@ -24,4 +24,3 @@ class ReviewResource extends JsonResource
         ];
     }
 }
-

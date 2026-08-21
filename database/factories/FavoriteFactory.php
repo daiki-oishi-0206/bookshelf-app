@@ -7,9 +7,9 @@ use App\Models\User;
 use App\Models\Book;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Review>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Favorite>
  */
-class ReviewFactory extends Factory
+class FavoriteFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -21,8 +21,7 @@ class ReviewFactory extends Factory
         return [
             'user_id' => User::factory(),
             'book_id' => Book::factory(),
-            'rating' => fake()->numberBetween(1, 5),
-            'comment' => fake()->paragraph(),
         ];
     }
 }
+

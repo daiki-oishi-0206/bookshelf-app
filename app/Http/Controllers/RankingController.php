@@ -14,6 +14,7 @@ class RankingController extends Controller
             ->withCount('reviews')
             ->has('reviews')
             ->orderByDesc('reviews_avg_rating')
+            ->orderBy('id')
             ->take(10)
             ->get();
 

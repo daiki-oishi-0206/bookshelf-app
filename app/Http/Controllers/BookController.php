@@ -55,6 +55,8 @@ class BookController extends Controller
 
     public function edit(Book $book): View
     {
+        $this->authorize('update', $book);
+        
         $genres = Genre::all();
 
         return view('books.edit', compact('book', 'genres'));
@@ -62,6 +64,8 @@ class BookController extends Controller
 
     public function update(UpdateBookRequest $request, Book $book): RedirectResponse
     {
+        $this->authorize('update', $book);
+
         $book->update([
             'title' => $request->title,
             'author' => $request->author,
@@ -71,6 +75,8 @@ class BookController extends Controller
             'image_url' => $request->image_url,
         ]);
 
+        $book->genres()->sync($request->genres);
+
         return redirect()
             ->route('books.show', $book)
             ->with('success', '書籍を更新しました');
@@ -78,6 +84,8 @@ class BookController extends Controller
 
     public function destroy(Book $book): RedirectResponse
     {
+        abort_unless($book->user_id === Auth::id(), 403);
+        
         $book->delete();
 
         return redirect()

@@ -47,3 +47,5 @@ class Book extends Model
         return $this->belongsToMany(User::class, 'favorites');
     }
 }
+
+

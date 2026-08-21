@@ -21,9 +21,6 @@ use App\Http\Controllers\ReviewController;
 Route::get('/', [BookController::class, 'index'])
     ->name('books.index');
 
-Route::get('/books', [BookController::class, 'index'])
-    ->name('books.index');
-
 
 Route::middleware('auth')->group(function () {
 
@@ -39,7 +36,7 @@ Route::middleware('auth')->group(function () {
         ->name('books.destroy');
 
 
-    Route::get('/favorite', [FavoriteController::class, 'index'])
+    Route::get('/favorites', [FavoriteController::class, 'index'])
         ->name('favorites.index');
     Route::post('/books/{book}/favorite', [FavoriteController::class, 'toggle'])
         ->name('favorites.toggle');
@@ -80,3 +77,4 @@ Route::get('/books/{book}', [BookController::class, 'show'])
 
 Route::get('/ranking', [RankingController::class, 'index'])
     ->name('ranking.index');
+    
