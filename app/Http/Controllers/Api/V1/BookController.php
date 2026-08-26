@@ -12,6 +12,7 @@ use App\Http\Resources\Api\V1\BookDetailResource;
 use App\Http\Requests\Api\V1\StoreBookRequest;
 use App\Http\Requests\Api\V1\UpdateBookRequest;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Facades\Auth;
 
 class BookController extends Controller
 {
@@ -57,8 +58,8 @@ class BookController extends Controller
         $genres = $data['genres'];
         unset($data['genres']);
 
-        $data['user_id'] = 1;
-        //Sanctum実装後はAuth::id()へ変更
+        $data['user_id'] = Auth::id();
+
         $book = Book::create($data);
 
         $book->genres()->attach($genres);
