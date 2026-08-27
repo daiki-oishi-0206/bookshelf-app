@@ -11,7 +11,8 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use App\Http\Resources\Api\V1\BookDetailResource;
 use App\Http\Requests\Api\V1\StoreBookRequest;
 use App\Http\Requests\Api\V1\UpdateBookRequest;
-use GuzzleHttp\Psr7\Response;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 
 class BookController extends Controller
 {
@@ -50,15 +51,15 @@ class BookController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreBookRequest $request)
+    public function store(StoreBookRequest $request): Response
     {
         $data = $request->validated();
 
         $genres = $data['genres'];
         unset($data['genres']);
 
-        $data['user_id'] = 1;
-        //Sanctum実装後はAuth::id()へ変更
+        $data['user_id'] = Auth::id();
+
         $book = Book::create($data);
 
         $book->genres()->attach($genres);
@@ -85,7 +86,7 @@ class BookController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateBookRequest $request, Book $book)
+    public function update(UpdateBookRequest $request, Book $book): Response
     {
         $data = $request->validated();
         $book->update($data);
@@ -98,10 +99,12 @@ class BookController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Book $book)
+    public function destroy(Book $book): Response
     {
         $book->delete();
 
         return response('', 200);
     }
 }
+
+// 型宣言までオッケー

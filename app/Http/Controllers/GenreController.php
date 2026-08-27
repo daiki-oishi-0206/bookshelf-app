@@ -8,13 +8,14 @@ use App\Models\Genre;
 use GrahamCampbell\ResultType\Success;
 use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\StoreGenreRequest;
-use App\Http\Requests\UpdateBookRequest;
 use App\Http\Requests\UpdateGenreRequest;
+use Illuminate\Database\Eloquent\Collection;
 
 class GenreController extends Controller
 {
     public function index(): View
     {
+        /** @var Collection<int, Genre> $genres */
         $genres = Genre::all();
         return View('genres.index', compact('genres'));
     }
@@ -39,7 +40,7 @@ class GenreController extends Controller
     {
         if ($genre->books()->exists()) {
             return redirect()
-                ->route('genres.index',)
+                ->route('genres.index')
                 ->with('error', 'このジャンルを使用している書籍があるため削除できません');
         }
 
