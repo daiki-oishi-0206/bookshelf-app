@@ -8,10 +8,12 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 use App\Http\Requests\StoreReviewRequest;
 use App\Http\Requests\UpdateReviewRequest;
+use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 
 class ReviewController extends Controller
 {
-    public function store(StoreReviewRequest $request, Book $book)
+    public function store(StoreReviewRequest $request, Book $book): RedirectResponse
     {
         Review::create([
             'book_id' => $book->id,
@@ -23,9 +25,9 @@ class ReviewController extends Controller
         return back()->with('success', 'レビューを投稿しました');
     }
 
-    public function like(Review $review)
+    public function like(Review $review): RedirectResponse
     {
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = auth()->user();
 
         if ($user->likedReviews()->where('review_id', $review->id)->exists()) {
@@ -46,7 +48,7 @@ class ReviewController extends Controller
         return view('reviews.edit', compact('review'));
     }
 
-    public function update(UpdateReviewRequest $request, Review $review)
+    public function update(UpdateReviewRequest $request, Review $review): RedirectResponse
     {
         $this->authorize('update', $review);
 
@@ -60,7 +62,7 @@ class ReviewController extends Controller
             ->with('success', 'レビューを更新しました');
     }
 
-    public function destroy(Review $review)
+    public function destroy(Review $review): RedirectResponse
     {
         abort_unless($review->user_id === auth()->id(), 403);
         $review->delete();

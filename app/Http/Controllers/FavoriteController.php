@@ -7,12 +7,13 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Book;
+use App\Models\User;
 
 class FavoriteController extends Controller
 {
     public function index(): View
     {
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = Auth::user();
 
         $books = $user->favoriteBooks()->paginate(10);
@@ -22,7 +23,7 @@ class FavoriteController extends Controller
 
     public function toggle(Book $book): RedirectResponse
     {
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = Auth::user();
 
         if ($user->favoriteBooks()->where('book_id', $book->id)->exists()) {
