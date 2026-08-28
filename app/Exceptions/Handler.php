@@ -5,6 +5,7 @@ namespace App\Exceptions;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
+use Illuminate\Auth\Access\AuthorizationException;
 
 class Handler extends ExceptionHandler
 {
@@ -35,6 +36,12 @@ class Handler extends ExceptionHandler
             return response()->json([
                 'error' => '書籍が見つかりませんでした。',
             ], 404);
+        }
+
+        if ($request->is('api/*') && $e instanceof AuthorizationException) {
+            return response()->json([
+                'error' => 'この操作を実行する権限がありません。',
+            ], 403);
         }
 
         return parent::render($request, $e);
