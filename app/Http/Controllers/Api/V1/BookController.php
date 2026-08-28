@@ -88,6 +88,7 @@ class BookController extends Controller
      */
     public function update(UpdateBookRequest $request, Book $book): Response
     {
+        $this->authorize('update', $book);
         $data = $request->validated();
         $book->update($data);
 
@@ -101,10 +102,10 @@ class BookController extends Controller
      */
     public function destroy(Book $book): Response
     {
+        $this->authorize('delete', $book);
         $book->delete();
 
         return response('', 200);
     }
 }
 
-// 型宣言までオッケー

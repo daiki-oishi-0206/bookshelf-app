@@ -275,9 +275,8 @@ class BookApiTest extends TestCase
 
     public function test_正しい情報で書籍を登録できる(): void
     {
-        User::factory()->create([
-            'id' => 1,
-        ]);
+        $user = User::factory()->create();
+
         $genre = Genre::factory()->create([
             'name' => '技術書',
         ]);
@@ -290,7 +289,7 @@ class BookApiTest extends TestCase
             'genres' => [$genre->id],
         ];
 
-        $response = $this->postJson('/api/v1/books', $data);
+        $response = $this->actingAs($user, 'sanctum')->postJson('/api/v1/books', $data);
 
         $response->assertStatus(201);
 
@@ -311,9 +310,10 @@ class BookApiTest extends TestCase
 
     public function test_書籍登録時のバリデーション(): void
     {
+        $user = User::factory()->create();
+
         $genre = Genre::factory()->create();
 
-        // ISBN重複テスト用
         Book::factory()->create([
             'isbn' => '9781234567890',
         ]);
@@ -417,7 +417,7 @@ class BookApiTest extends TestCase
         foreach ($testCases as $case) {
             $data = array_merge($validData, $case['data']);
 
-            $response = $this->postJson('/api/v1/books', $data);
+            $response = $this->actingAs($user, 'sanctum')->postJson('/api/v1/books', $data);
 
             $response->assertStatus(422);
 
@@ -427,6 +427,8 @@ class BookApiTest extends TestCase
 
     public function test_正しい情報で書籍を更新できる(): void
     {
+        $user = User::factory()->create();
+
         $genre1 = Genre::factory()->create([
             'name' => '小説',
         ]);
@@ -436,6 +438,7 @@ class BookApiTest extends TestCase
         ]);
 
         $book = Book::factory()->create([
+            'user_id' => $user->id,
             'title' => 'Laravel入門',
             'author' => '山田太郎',
             'isbn' => '9781234567890',
@@ -452,7 +455,7 @@ class BookApiTest extends TestCase
             'genres' => [$genre2->id],
         ];
 
-        $response = $this->putJson(
+        $response = $this->actingAs($user, 'sanctum')->putJson(
             "/api/v1/books/{$book->id}",
             $data
         );
@@ -475,11 +478,14 @@ class BookApiTest extends TestCase
 
     public function test_自身のISBN13を維持して書籍を更新できる(): void
     {
+        $user = User::factory()->create();
+
         $genre = Genre::factory()->create([
             'name' => '技術書',
         ]);
 
         $book = Book::factory()->create([
+            'user_id' => $user->id,
             'title' => 'Laravel入門',
             'author' => '山田太郎',
             'isbn' => '9781234567890',
@@ -496,7 +502,7 @@ class BookApiTest extends TestCase
             'genres' => [$genre->id],
         ];
 
-        $response = $this->putJson(
+        $response = $this->actingAs($user, 'sanctum')->putJson(
             "/api/v1/books/{$book->id}",
             $data
         );
@@ -514,10 +520,12 @@ class BookApiTest extends TestCase
 
     public function test_書籍更新時のバリデーション(): void
     {
+        $user = User::factory()->create();
+
         $genre = Genre::factory()->create();
 
-        // 更新対象
         $book = Book::factory()->create([
+            'user_id' => $user->id,
             'title' => 'Laravel入門',
             'author' => '山田太郎',
             'isbn' => '9781234567890',
@@ -526,7 +534,6 @@ class BookApiTest extends TestCase
 
         $book->genres()->attach($genre);
 
-        // ISBN重複テスト用
         $otherBook = Book::factory()->create([
             'isbn' => '9781234567891',
         ]);
@@ -630,7 +637,7 @@ class BookApiTest extends TestCase
         foreach ($testCases as $case) {
             $data = array_merge($validData, $case['data']);
 
-            $response = $this->putJson(
+            $response = $this->actingAs($user, 'sanctum')->putJson(
                 "/api/v1/books/{$book->id}",
                 $data
             );
@@ -643,6 +650,8 @@ class BookApiTest extends TestCase
 
     public function test_存在しない書籍を更新できない(): void
     {
+        $user = User::factory()->create();
+
         $genre = Genre::factory()->create();
 
         $data = [
@@ -655,7 +664,7 @@ class BookApiTest extends TestCase
             'genres' => [$genre->id],
         ];
 
-        $response = $this->putJson(
+        $response = $this->actingAs($user, 'sanctum')->putJson(
             '/api/v1/books/99999',
             $data
         );
@@ -669,9 +678,13 @@ class BookApiTest extends TestCase
 
     public function test_書籍を削除できる(): void
     {
-        $book = Book::factory()->create();
+        $user = User::factory()->create();
 
-        $response = $this->deleteJson(
+        $book = Book::factory()->create([
+            'user_id' => $user->id,
+        ]);
+
+        $response = $this->actingAs($user, 'sanctum')->deleteJson(
             "/api/v1/books/{$book->id}"
         );
 
@@ -684,7 +697,9 @@ class BookApiTest extends TestCase
 
     public function test_存在しない書籍を削除できない(): void
     {
-        $response = $this->deleteJson('/api/v1/books/99999');
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user, 'sanctum')->deleteJson('/api/v1/books/99999');
 
         $response->assertStatus(404);
 
@@ -693,4 +708,3 @@ class BookApiTest extends TestCase
         ]);
     }
 }
-
