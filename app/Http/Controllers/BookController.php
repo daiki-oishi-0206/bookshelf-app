@@ -11,6 +11,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\UpdateBookRequest;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Http;
 
 
 class BookController extends Controller
@@ -55,6 +56,37 @@ class BookController extends Controller
         /** @var Collection<int, Genre> $genres */
         $genres = Genre::all();
         return view('books.create', compact('genres'));
+    }
+
+    public function isbnSearch(string $isbn)
+    {
+        $response = Http::get('https://www.googleapis.com/books/v1/volumes', [
+            'q' => 'isbn:' . $isbn,
+        ]);
+
+        if ($response->failed()) {
+            return response()->json([
+                'error' => 'Google Books APIとの通信に失敗しました。',
+            ], 500);
+        }
+
+        $data = $response->json();
+
+        if (empty($data['items'])) {
+            return response()->json([
+                'error' => '書籍情報が見つかりませんでした。',
+            ], 404);
+        }
+
+        $book = $data['items'][0]['volumeInfo'];
+
+        return response()->json([
+            'title' => $book['title'] ?? '',
+            'author' => $book['authors'][0] ?? '',
+            'description' => $book['description'] ?? '',
+            'image_url' => $book['imageLinks']['thumbnail'] ?? '',
+            'published_date' => $book['publishedDate'] ?? '',
+        ]);
     }
 
     public function store(StoreBookRequest $request): RedirectResponse
