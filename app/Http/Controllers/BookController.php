@@ -19,7 +19,7 @@ class BookController extends Controller
     {
         $query = Book::query()
         ->with('genres')
-        ->withAvg('review', 'rating');
+        ->withAvg('reviews', 'rating');
 
         if($request->filled('keyword')){
             $query->where(function($q)use($request){
@@ -45,7 +45,7 @@ class BookController extends Controller
         }
 
 
-        $books = $query->paginate(10);
+        $books = $query->withQueryString()->paginate(10);
             
         return view('books.index', compact('books'));
     }
