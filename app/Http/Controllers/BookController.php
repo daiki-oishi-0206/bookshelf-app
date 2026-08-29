@@ -15,11 +15,38 @@ use Illuminate\Database\Eloquent\Collection;
 
 class BookController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $books = Book::with('genres')
-            ->paginate(10);
+        $query = Book::query()
+        ->with('genres')
+        ->withAvg('review', 'rating');
 
+        if($request->filled('keyword')){
+            $query->where(function($q)use($request){
+                $q->where('title', 'like', "%{$request->keyword}%")
+                ->orWhere('author', 'like', "%{$request->keyword}%");
+            });
+        }
+
+        if($request->filled('genre_id')){
+            $query->whereHas('genres', function($q) use ($request){
+                $q->where('genres.id', $request->genre_id);
+            });
+        }
+        
+        if($request->sort === 'newest'){
+            $query->orderByDesc('created_at');
+        }elseif($request->sort === 'oldest'){
+            $query->orderBy('created_at');
+        }elseif($request->sort === 'rating'){
+            $query->orderByDesc('reviews_avg_rating');
+        }elseif($request->sort === 'title'){
+            $query->orderBy('title');
+        }
+
+
+        $books = $query->paginate(10);
+            
         return view('books.index', compact('books'));
     }
 
