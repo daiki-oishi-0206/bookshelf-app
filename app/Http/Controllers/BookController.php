@@ -10,13 +10,15 @@ use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\UpdateBookRequest;
+use App\Http\Requests\IndexBookRequest;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Http;
 
 
+
 class BookController extends Controller
 {
-    public function index(Request $request): View
+    public function index(IndexBookRequest $request): View
     {
         $query = Book::query()
         ->with('genres')
@@ -29,9 +31,9 @@ class BookController extends Controller
             });
         }
 
-        if($request->filled('genre_id')){
+        if($request->filled('genre')){
             $query->whereHas('genres', function($q) use ($request){
-                $q->where('genres.id', $request->genre_id);
+                $q->where('genres.id', $request->genre);
             });
         }
         
