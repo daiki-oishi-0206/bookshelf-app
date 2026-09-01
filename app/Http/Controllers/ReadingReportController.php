@@ -23,6 +23,19 @@ class ReadingReportController extends Controller
                 ->groupBy('rating')
                 ->map->count()
                 ->sortKeys(),
+
+            'top_rated_books' => $reviews
+                ->where('rating', '>=', 4)
+                ->sortByDesc('rating')
+                ->take(5)
+                ->map(function ($review) {
+                    return [
+                        'id' => $review->book->id,
+                        'title' => $review->book->title,
+                        'author' => $review->book->author,
+                        'rating' => $review->rating,
+                    ];
+                }),
         ];
 
         return view('reports.index', compact('stats'));
