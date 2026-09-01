@@ -40,9 +40,8 @@
                     <div class="p-6">
                         <h3 class="text-lg font-semibold text-gray-900 mb-4">評価分布</h3>
                         <div class="space-y-3">
-                            @foreach ($stats['rating_distribution'] as $index => $count)
+                            @foreach ($stats['rating_distribution'] as $rating => $count)
                                 @php
-                                    $rating = $index + 1;
                                     $maxCount = $stats['rating_distribution']->max() ?: 1;
                                     $percentage = ($count / $maxCount) * 100;
                                 @endphp

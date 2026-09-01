@@ -18,6 +18,11 @@ class ReadingReportController extends Controller
                 'books_read' => $reviews->unique('book_id')->count(),
                 'average_rating' => $reviews->avg('rating') ?? 0,
             ],
+
+            'rating_distribution' => $reviews
+                ->groupBy('rating')
+                ->map->count()
+                ->sortKeys(),
         ];
 
         return view('reports.index', compact('stats'));
