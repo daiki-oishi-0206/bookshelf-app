@@ -6,6 +6,7 @@ use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\GenreController;
 use App\Http\Controllers\RankingController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\ReadingReportController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -36,6 +37,9 @@ Route::middleware('auth')->group(function () {
         ->name('books.update');
     Route::delete('/books/{book}', [BookController::class, 'destroy'])
         ->name('books.destroy');
+
+    Route::get('/reports', [ReadingReportController::class, 'index'])
+        ->name('reports.index');
 
 
     Route::get('/favorites', [FavoriteController::class, 'index'])
