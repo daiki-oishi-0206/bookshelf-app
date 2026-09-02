@@ -11,6 +11,7 @@ class ReadingReportController extends Controller
     {
         $user = auth()->user();
         $reviews = $user->reviews;
+        $reviews->load('book.genres');
 
         $stats = [
             'summary' => [
@@ -36,8 +37,33 @@ class ReadingReportController extends Controller
                         'rating' => $review->rating,
                     ];
                 }),
+
+            'genre_ratings' => $reviews
+                ->flatMap(function ($review) {
+                    return $review->book->genres->map(function ($genre) use ($review) {
+                        return [
+                            'id' => $genre->id,
+                            'name' => $genre->name,
+                            'rating' => $review->rating,
+                        ];
+                    });
+                })
+                ->groupBy('id')
+                ->map(function ($genreReviews){
+                    return[
+                        'id' => $genreReviews->first()['id'],
+                        'name' => $genreReviews->first()['name'],
+                        'count' => $genreReviews->count(),
+                        'average_rating' => $genreReviews->avg('rating'),
+                    ];
+                })
+                ->sortByDesc('average_rating')
+                ->take(5)
+                ->values()
         ];
 
         return view('reports.index', compact('stats'));
     }
 }
+
+
