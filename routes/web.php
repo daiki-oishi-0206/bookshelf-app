@@ -7,6 +7,7 @@ use App\Http\Controllers\GenreController;
 use App\Http\Controllers\RankingController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ReadingReportController;
+use App\Http\Controllers\ReadingPlanController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -41,6 +42,20 @@ Route::middleware('auth')->group(function () {
     Route::get('/reports', [ReadingReportController::class, 'index'])
         ->name('reports.index');
 
+    Route::get('/reading-plans', [ReadingPlanController::class, 'index'])
+        ->name('reading-plans.index');
+    Route::get('/reading-plans/create', [ReadingPlanController::class, 'create'])
+        ->name('reading-plans.create');
+    Route::post('/reading-plans', [ReadingPlanController::class, 'store'])
+        ->name('reading-plans.store');
+    Route::get('/reading-plans/{readingPlan}/edit', [ReadingPlanController::class, 'edit'])
+        ->name('reading-plans.edit');
+    Route::put('/reading-plans/{readingPlan}', [ReadingPlanController::class, 'update'])
+        ->name('reading-plans.update');
+    Route::delete('/reading-plans/{readingPlan}', [ReadingPlanController::class, 'destroy'])
+        ->name('reading-plans.destroy');
+    Route::post('/reading-plans/{readingPlan}/complete', [ReadingPlanController::class, 'complete'])
+        ->name('reading-plans.complete');
 
     Route::get('/favorites', [FavoriteController::class, 'index'])
         ->name('favorites.index');

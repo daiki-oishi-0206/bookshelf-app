@@ -23,7 +23,7 @@ class UpdateReadingPlanRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'due_date' => ['required', 'date', 'after_or_equal:today']
+            'target_date' => ['required', 'date', 'after_or_equal:today']
         ];
     }
 
@@ -31,9 +31,9 @@ class UpdateReadingPlanRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'due_date.required' => '期日は必須です',
-            'due_date.date' => '期日は有効な日付で入力してください',
-            'due_date.after_or_equal' => '期日は今日以降の日付を入力してください'
+            'target_date.required' => '期日は必須です',
+            'target_date.date' => '期日は有効な日付で入力してください',
+            'target_date.after_or_equal' => '期日は今日以降の日付を入力してください'
         ];
     }
 }

@@ -20,10 +20,12 @@ class ReadingReportController extends Controller
                 'average_rating' => $reviews->avg('rating') ?? 0,
             ],
 
-            'rating_distribution' => $reviews
-                ->groupBy('rating')
-                ->map->count()
-                ->sortKeys(),
+            'rating_distribution' => collect(range(1, 5))
+                ->mapWithKeys(function ($rating) use ($reviews) {
+                    return [
+                        $rating - 1 => $reviews->where('rating', $rating)->count(),
+                    ];
+                }),
 
             'top_rated_books' => $reviews
                 ->where('rating', '>=', 4)

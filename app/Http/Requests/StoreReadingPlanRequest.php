@@ -35,7 +35,7 @@ class StoreReadingPlanRequest extends FormRequest
                         ReadingPlanStatus::READING->value,
                     ]),
             ],
-            'due_date' => ['required', 'date', 'after_or_equal:today'],
+            'target_date' => ['required', 'date', 'after_or_equal:today'],
         ];
     }
 
@@ -46,9 +46,9 @@ class StoreReadingPlanRequest extends FormRequest
             'book_id.exists' => '選択した書籍が存在しません',
             'book_id.unique' => 'この書籍はすでに読書計画に登録されています',
 
-            'due_date.required' => '期日は必須です',
-            'due_date.date' => '期日は有効な日付を入力してください',
-            'due_date.after_or_equal' => '期日は今日以降の日付を指定してください',
+            'target_date.required' => '期日は必須です',
+            'target_date.date' => '期日は有効な日付を入力してください',
+            'target_date.after_or_equal' => '期日は今日以降の日付を指定してください',
         ];
     }
 }

@@ -13,7 +13,7 @@ class ReadingPlan extends Model
 
     protected $fillable = [
         'status',
-        'due_date',
+        'target_date',
     ];
 
     protected $casts = [
