@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\GenreController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\RankingController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ReadingReportController;
@@ -56,6 +57,11 @@ Route::middleware('auth')->group(function () {
         ->name('reading-plans.destroy');
     Route::post('/reading-plans/{readingPlan}/complete', [ReadingPlanController::class, 'complete'])
         ->name('reading-plans.complete');
+
+    Route::get('/notifications', [NotificationController::class, 'index'])
+        ->name('notifications.index');
+    Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])
+        ->name('notifications.read');
 
     Route::get('/favorites', [FavoriteController::class, 'index'])
         ->name('favorites.index');
