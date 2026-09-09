@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('status');
             $table->date('target_date');
             $table->timestamps();
-            $table->unique(['user_id', 'book_id']);
+            // $table->unique(['user_id', 'book_id']);
         });
     }
 

@@ -12,6 +12,8 @@ class ReadingPlan extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
+        'book_id',
         'status',
         'target_date',
     ];

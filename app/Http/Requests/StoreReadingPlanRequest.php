@@ -33,6 +33,7 @@ class StoreReadingPlanRequest extends FormRequest
                     ->whereIn('status', [
                         ReadingPlanStatus::NOT_STARTED->value,
                         ReadingPlanStatus::READING->value,
+                        ReadingPlanStatus::OVERDUE->value,
                     ]),
             ],
             'target_date' => ['required', 'date', 'after_or_equal:today'],

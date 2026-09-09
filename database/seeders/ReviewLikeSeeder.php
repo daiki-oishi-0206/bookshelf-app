@@ -23,7 +23,7 @@ class ReviewLikeSeeder extends Seeder
 
             $likeUserIds = $likeUsers->pluck('id');
 
-            $review->likedUsers()->syncWithoutDetaching($likeUserIds);
+            $review->likedByUsers()->syncWithoutDetaching($likeUserIds);
         }
     }
 }
