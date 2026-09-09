@@ -147,7 +147,7 @@ class BookController extends Controller
 
     public function destroy(Book $book): RedirectResponse
     {
-        abort_unless($book->user_id === Auth::id(), 403);
+        $this->authorize('delete', $book);
         
         $book->delete();
 
@@ -156,3 +156,4 @@ class BookController extends Controller
             ->with('success', '書籍を削除しました');
     }
 }
+

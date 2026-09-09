@@ -64,7 +64,8 @@ class ReviewController extends Controller
 
     public function destroy(Review $review): RedirectResponse
     {
-        abort_unless($review->user_id === auth()->id(), 403);
+        $this->authorize('delete', $review);
+        
         $review->delete();
 
         return redirect()
