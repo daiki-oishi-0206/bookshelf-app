@@ -31,25 +31,25 @@ class SendReadingPlanReminders extends Command
     {
         ReadingPlan::query()
             ->whereIn('status', [
-                ReadingPlanStatus::NOT_STARTED,
-                ReadingPlanStatus::READING,
+                ReadingPlanStatus::NotStarted,
+                ReadingPlanStatus::Reading,
             ])
             ->whereDate('target_date', '<', today())
             ->update([
-                'status' => ReadingPlanStatus::OVERDUE,
+                'status' => ReadingPlanStatus::Overdue,
             ]);
 
 
         $readingPlans = ReadingPlan::query()
             ->whereIn('status', [
-                ReadingPlanStatus::NOT_STARTED,
-                ReadingPlanStatus::READING,
+                ReadingPlanStatus::NotStarted,
+                ReadingPlanStatus::Reading,
             ])
             ->whereDate('target_date', today()->addDays(3))
             ->with(['user', 'book'])
             ->get();
 
-        foreach ($readingPlans as $readingPlan){
+        foreach ($readingPlans as $readingPlan) {
             $readingPlan->user->notify(
                 new ReadingPlanReminderNotification(
                     $readingPlan,
@@ -60,14 +60,14 @@ class SendReadingPlanReminders extends Command
 
         $readingPlans = ReadingPlan::query()
             ->whereIn('status', [
-                ReadingPlanStatus::NOT_STARTED,
-                ReadingPlanStatus::READING,
+                ReadingPlanStatus::NotStarted,
+                ReadingPlanStatus::Reading,
             ])
             ->whereDate('target_date', today())
             ->with(['user', 'book'])
             ->get();
 
-        foreach ($readingPlans as $readingPlan){
+        foreach ($readingPlans as $readingPlan) {
             $readingPlan->user->notify(
                 new ReadingPlanReminderNotification(
                     $readingPlan,
@@ -77,12 +77,12 @@ class SendReadingPlanReminders extends Command
         }
 
         $readingPlans = ReadingPlan::query()
-            ->where('status', ReadingPlanStatus::OVERDUE)
+            ->where('status', ReadingPlanStatus::Overdue)
             ->whereDate('target_date', today()->subDays(3))
             ->with(['user', 'book'])
             ->get();
 
-        foreach ($readingPlans as $readingPlan){
+        foreach ($readingPlans as $readingPlan) {
             $readingPlan->user->notify(
                 new ReadingPlanReminderNotification(
                     $readingPlan,
@@ -94,5 +94,3 @@ class SendReadingPlanReminders extends Command
         return self::SUCCESS;
     }
 }
-
-

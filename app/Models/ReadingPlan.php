@@ -20,7 +20,7 @@ class ReadingPlan extends Model
 
     protected $casts = [
         'status' => ReadingPlanStatus::class,
-        'due_date' => 'date',
+        'target_date' => 'date',
     ];
 
     public function user()
@@ -35,16 +35,16 @@ class ReadingPlan extends Model
 
     public function scopeNotStarted(Builder $query)
     {
-        return $query->where('status', ReadingPlanStatus::NOT_STARTED);
+        return $query->where('status', ReadingPlanStatus::NotStarted);
     }
 
     public function scopeReading(Builder $query)
     {
-        return $query->where('status', ReadingPlanStatus::READING);
+        return $query->where('status', ReadingPlanStatus::Reading);
     }
 
     public function scopeCompleted(Builder $query)
     {
-        return $query->where('status', ReadingPlanStatus::COMPLETED);
+        return $query->where('status', ReadingPlanStatus::Completed);
     }
 }

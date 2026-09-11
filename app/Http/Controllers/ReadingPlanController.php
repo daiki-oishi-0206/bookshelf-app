@@ -15,10 +15,21 @@ use Illuminate\Support\Facades\Redirect;
 
 class ReadingPlanController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $readingPlans = auth()->user()->readingPlans;
-        return view('reading-plans.index', compact('readingPlans'));
+        $currentStatus = $request->status;
+
+        $readingPlans = auth()->user()
+            ->readingPlans()
+            ->when($currentStatus, function ($query) use ($currentStatus) {
+                $query->where('status', $currentStatus);
+            })
+            ->get();
+
+        return view('reading-plans.index', compact(
+            'readingPlans',
+            'currentStatus'
+        ));
     }
 
     public function create(): View
@@ -32,7 +43,7 @@ class ReadingPlanController extends Controller
         ReadingPlan::create([
             'user_id' => Auth::id(),
             'book_id' => $request->book_id,
-            'status' => ReadingPlanStatus::NOT_STARTED,
+            'status' => ReadingPlanStatus::NotStarted,
             'target_date' => $request->target_date,
         ]);
 
@@ -75,10 +86,13 @@ class ReadingPlanController extends Controller
         $this->authorize('update', $readingPlan);
 
         $readingPlan->update([
-            'status' => ReadingPlanStatus::COMPLETED,
+            'status' => ReadingPlanStatus::Completed,
         ]);
 
         return redirect()
             ->route('reading-plans.index');
     }
 }
+
+
+// ReadingPlanControllerの修正から

@@ -48,7 +48,7 @@ class BookController extends Controller
         }
 
 
-        $books = $query->withQueryString()->paginate(10);
+        $books = $query->paginate(10)->withQueryString();
             
         return view('books.index', compact('books'));
     }
