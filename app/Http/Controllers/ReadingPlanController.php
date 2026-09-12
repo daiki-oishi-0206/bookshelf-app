@@ -95,4 +95,3 @@ class ReadingPlanController extends Controller
 }
 
 
-// ReadingPlanControllerの修正から

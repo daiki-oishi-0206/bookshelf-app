@@ -49,8 +49,9 @@ class BookController extends Controller
 
 
         $books = $query->paginate(10)->withQueryString();
+        $genres = Genre::all();
             
-        return view('books.index', compact('books'));
+        return view('books.index', compact('books', 'genres'));
     }
 
     public function create(): View
