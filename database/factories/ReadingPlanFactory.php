@@ -24,7 +24,6 @@ class ReadingPlanFactory extends Factory
             'user_id' => User::factory(),
             'book_id' => Book::factory(),
             'status' => fake()->randomElement([
-                'not_started',
                 'reading',
                 'completed',
                 'overdue',

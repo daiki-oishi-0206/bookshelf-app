@@ -33,11 +33,6 @@ class ReadingPlan extends Model
         return $this->belongsTo(Book::class);
     }
 
-    public function scopeNotStarted(Builder $query)
-    {
-        return $query->where('status', ReadingPlanStatus::NotStarted);
-    }
-
     public function scopeReading(Builder $query)
     {
         return $query->where('status', ReadingPlanStatus::Reading);

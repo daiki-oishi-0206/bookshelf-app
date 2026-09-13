@@ -22,7 +22,7 @@ class ReadingPlanSeeder extends Seeder
         ReadingPlan::create([
             'user_id' => $users[0]->id,
             'book_id' => $books[0]->id,
-            'status' => 'not_started',
+            'status' => 'reading',
             'target_date' => Carbon::today()->subDays(1),
         ]);
         
@@ -30,62 +30,48 @@ class ReadingPlanSeeder extends Seeder
             'user_id' => $users[0]->id,
             'book_id' => $books[1]->id,
             'status' => 'reading',
-            'target_date' => Carbon::today()->subDays(1),
-        ]);
-
-        ReadingPlan::create([
-            'user_id' => $users[0]->id,
-            'book_id' => $books[2]->id,
-            'status' => 'not_started',
             'target_date' => Carbon::today()->addDays(3),
         ]);
 
         ReadingPlan::create([
             'user_id' => $users[0]->id,
-            'book_id' => $books[3]->id,
+            'book_id' => $books[2]->id,
             'status' => 'reading',
             'target_date' => Carbon::today(),
         ]);
 
         ReadingPlan::create([
             'user_id' => $users[0]->id,
-            'book_id' => $books[4]->id,
+            'book_id' => $books[3]->id,
             'status' => 'overdue',
             'target_date' => Carbon::today()->subDays(3),
         ]);
 
         ReadingPlan::create([
             'user_id' => $users[0]->id,
-            'book_id' => $books[5]->id,
-            'status' => 'not_started',
-            'target_date' => Carbon::today()->addDays(1),
-        ]);
-
-        ReadingPlan::create([
-            'user_id' => $users[0]->id,
-            'book_id' => $books[6]->id,
+            'book_id' => $books[4]->id,
             'status' => 'reading',
             'target_date' => Carbon::today()->addDays(1),
         ]);
 
         ReadingPlan::create([
             'user_id' => $users[0]->id,
-            'book_id' => $books[7]->id,
+            'book_id' => $books[5]->id,
             'status' => 'completed',
             'target_date' => Carbon::today()->subDays(1),
         ]);
 
         ReadingPlan::create([
             'user_id' => $users[0]->id,
-            'book_id' => $books[7]->id,
-            'status' => 'not_started',
+            'book_id' => $books[5]->id,
+            'status' => 'reading',
             'target_date' => Carbon::today()->addDays(3),
         ]);
 
         ReadingPlan::create([
             'user_id' => $users[1]->id,
-            'book_id' => $books[8]->id,
-            'status' => 'not_started',
+            'book_id' => $books[6]->id,
+            'status' => 'reading',
             'target_date' => Carbon::today()->addDays(3),
         ]);
 

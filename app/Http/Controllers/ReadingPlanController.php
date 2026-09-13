@@ -9,9 +9,9 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 use App\Models\Book;
 use App\Models\ReadingPlan;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Redirect;
 
 class ReadingPlanController extends Controller
 {
@@ -19,7 +19,10 @@ class ReadingPlanController extends Controller
     {
         $currentStatus = $request->status;
 
-        $readingPlans = auth()->user()
+        /** @var User $user */
+        $user = auth()->user();
+
+        $readingPlans = $user
             ->readingPlans()
             ->when($currentStatus, function ($query) use ($currentStatus) {
                 $query->where('status', $currentStatus);
@@ -38,12 +41,12 @@ class ReadingPlanController extends Controller
         return view('reading-plans.create', compact('books'));
     }
 
-    public function store(StoreReadingPlanRequest $request,): RedirectResponse
+    public function store(StoreReadingPlanRequest $request): RedirectResponse
     {
         ReadingPlan::create([
             'user_id' => Auth::id(),
             'book_id' => $request->book_id,
-            'status' => ReadingPlanStatus::NotStarted,
+            'status' => ReadingPlanStatus::Reading,
             'target_date' => $request->target_date,
         ]);
 

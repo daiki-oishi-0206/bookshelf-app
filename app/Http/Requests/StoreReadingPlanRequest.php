@@ -31,7 +31,6 @@ class StoreReadingPlanRequest extends FormRequest
                 Rule::unique('reading_plans', 'book_id')
                     ->where('user_id', auth()->id())
                     ->whereIn('status', [
-                        ReadingPlanStatus::NotStarted->value,
                         ReadingPlanStatus::Reading->value,
                         ReadingPlanStatus::Overdue->value,
                     ]),

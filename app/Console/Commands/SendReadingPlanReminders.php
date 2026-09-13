@@ -30,10 +30,7 @@ class SendReadingPlanReminders extends Command
     public function handle(): int
     {
         ReadingPlan::query()
-            ->whereIn('status', [
-                ReadingPlanStatus::NotStarted,
-                ReadingPlanStatus::Reading,
-            ])
+            ->where('status', ReadingPlanStatus::Reading)
             ->whereDate('target_date', '<', today())
             ->update([
                 'status' => ReadingPlanStatus::Overdue,
@@ -41,10 +38,7 @@ class SendReadingPlanReminders extends Command
 
 
         $readingPlans = ReadingPlan::query()
-            ->whereIn('status', [
-                ReadingPlanStatus::NotStarted,
-                ReadingPlanStatus::Reading,
-            ])
+            ->where('status', ReadingPlanStatus::Reading)
             ->whereDate('target_date', today()->addDays(3))
             ->with(['user', 'book'])
             ->get();
@@ -59,10 +53,7 @@ class SendReadingPlanReminders extends Command
         }
 
         $readingPlans = ReadingPlan::query()
-            ->whereIn('status', [
-                ReadingPlanStatus::NotStarted,
-                ReadingPlanStatus::Reading,
-            ])
+            ->where('status', ReadingPlanStatus::Reading)
             ->whereDate('target_date', today())
             ->with(['user', 'book'])
             ->get();

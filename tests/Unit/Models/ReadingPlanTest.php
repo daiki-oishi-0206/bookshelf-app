@@ -43,9 +43,6 @@ class ReadingPlanTest extends TestCase
 
     public function test_ReadingPlanモデルのscope(): void
     {
-        ReadingPlan::factory()->create([
-            'status' => ReadingPlanStatus::NotStarted,
-        ]);
 
         ReadingPlan::factory()->create([
             'status' => ReadingPlanStatus::Reading,
@@ -55,15 +52,9 @@ class ReadingPlanTest extends TestCase
             'status' => ReadingPlanStatus::Completed,
         ]);
 
-        $notStartedPlans = ReadingPlan::notStarted()->get();
         $readingPlans = ReadingPlan::reading()->get();
         $completedPlans = ReadingPlan::completed()->get();
 
-        $this->assertCount(1, $notStartedPlans);
-        $this->assertEquals(
-            ReadingPlanStatus::NotStarted,
-            $notStartedPlans->first()->status
-        );
 
         $this->assertCount(1, $readingPlans);
         $this->assertEquals(
@@ -78,3 +69,5 @@ class ReadingPlanTest extends TestCase
         );
     }
 }
+
+// ⬆️実装完了
