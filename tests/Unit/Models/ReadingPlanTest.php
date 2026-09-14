@@ -69,5 +69,3 @@ class ReadingPlanTest extends TestCase
         );
     }
 }
-
-// ⬆️実装完了
