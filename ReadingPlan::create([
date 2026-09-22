@@ -1,0 +1,12 @@
+[90m= [39m[34;4mApp\Models\Book[39;24m {#8161
+    [34muser_id[39m: [35m6[39m,
+    [34mtitle[39m: [32m"[39m[32mMollitia itaque maiores.[39m[32m"[39m,
+    [34mauthor[39m: [32m"[39m[32mJaquan Vandervort[39m[32m"[39m,
+    [34misbn[39m: [32m"[39m[32m9782701741481[39m[32m"[39m,
+    [34mpublished_date[39m: [32m"[39m[32m2014-05-02 00:00:00[39m[32m"[39m,
+    [34mdescription[39m: [32m"[39m[32mOmnis quas id eum consequatur et. Consequuntur placeat sit perspiciatis sed. Quos soluta reiciendis necessitatibus. Quia occaecati asperiores at non doloribus animi maiores.[39m[32m"[39m,
+    [34mimage_url[39m: [32m"[39m[32mhttps://via.placeholder.com/640x480.png/00dd11?text=et[39m[32m"[39m,
+    [34mupdated_at[39m: [32m"[39m[32m2026-09-22 19:41:13[39m[32m"[39m,
+    [34mcreated_at[39m: [32m"[39m[32m2026-09-22 19:41:13[39m[32m"[39m,
+    [34mid[39m: [35m12[39m,
+  }
