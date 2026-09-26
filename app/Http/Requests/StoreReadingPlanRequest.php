@@ -51,4 +51,6 @@ class StoreReadingPlanRequest extends FormRequest
             'target_date.after_or_equal' => '期日は今日以降の日付を指定してください',
         ];
     }
+
+    
 }
