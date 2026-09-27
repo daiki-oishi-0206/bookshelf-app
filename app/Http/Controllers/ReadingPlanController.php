@@ -93,7 +93,8 @@ class ReadingPlanController extends Controller
         ]);
 
         return redirect()
-            ->route('reading-plans.index');
+            ->route('reading-plans.index')
+            ->with('success', '読書計画を読了にしました');
     }
 }
 

@@ -707,4 +707,20 @@ class BookApiTest extends TestCase
             'error' => '書籍が見つかりませんでした。',
         ]);
     }
+
+    public function test_未認証で書籍を登録(): void
+    {
+        $response = $this->postJson('/api/v1/books', [
+            'title' => 'テスト書籍',
+            'author' => 'テスト著者',
+            'isbn' => '1234567890123',
+            'published_date' => '2026-09-28',
+            'description' => 'テスト',
+            'genres' => [1],
+        ]);
+
+        $response->dump();
+
+        $response->assertStatus(401);
+    }
 }
