@@ -7,7 +7,6 @@ use App\Models\ReadingPlan;
 use App\Notifications\ReadingPlanReminderNotification;
 use Illuminate\Console\Command;
 
-
 class SendReadingPlanReminders extends Command
 {
     /**
@@ -35,7 +34,6 @@ class SendReadingPlanReminders extends Command
             ->update([
                 'status' => ReadingPlanStatus::Overdue,
             ]);
-
 
         $readingPlans = ReadingPlan::query()
             ->where('status', ReadingPlanStatus::Reading)

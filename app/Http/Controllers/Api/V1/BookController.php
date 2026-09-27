@@ -3,14 +3,13 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Http\Requests\Api\V1\IndexBookRequest;
+use App\Http\Requests\Api\V1\StoreBookRequest;
+use App\Http\Requests\Api\V1\UpdateBookRequest;
+use App\Http\Resources\Api\V1\BookDetailResource;
 use App\Http\Resources\Api\V1\BookResource;
 use App\Models\Book;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use App\Http\Resources\Api\V1\BookDetailResource;
-use App\Http\Requests\Api\V1\StoreBookRequest;
-use App\Http\Requests\Api\V1\UpdateBookRequest;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 
@@ -108,4 +107,3 @@ class BookController extends Controller
         return response('', 200);
     }
 }
-

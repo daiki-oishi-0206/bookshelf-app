@@ -1,14 +1,15 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\GenreController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\RankingController;
-use App\Http\Controllers\ReviewController;
-use App\Http\Controllers\ReadingReportController;
 use App\Http\Controllers\ReadingPlanController;
+use App\Http\Controllers\ReadingReportController;
+use App\Http\Controllers\ReviewController;
+use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -20,10 +21,8 @@ use App\Http\Controllers\ReadingPlanController;
 |
 */
 
-
 Route::get('/', [BookController::class, 'index'])
     ->name('books.index');
-
 
 Route::middleware('auth')->group(function () {
 
@@ -68,7 +67,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/books/{book}/favorite', [FavoriteController::class, 'toggle'])
         ->name('favorites.toggle');
 
-
     Route::post('/books/{book}/review', [ReviewController::class, 'store'])
         ->name('reviews.store');
     Route::post('/reviews/{review}/like', [ReviewController::class, 'like'])
@@ -79,7 +77,6 @@ Route::middleware('auth')->group(function () {
         ->name('reviews.update');
     Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])
         ->name('reviews.destroy');
-
 
     Route::get('/genres', [GenreController::class, 'index'])
         ->name('genres.index');
@@ -95,9 +92,8 @@ Route::middleware('auth')->group(function () {
         ->name('genres.update');
     Route::delete('/genres/{genre}', [GenreController::class, 'destroy'])
         ->name('genres.destroy');
-    
-});
 
+});
 
 Route::get('/books/{book}', [BookController::class, 'show'])
     ->name('books.show');

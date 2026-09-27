@@ -2,15 +2,15 @@
 
 namespace Tests\Feature\CRUD;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
-use App\Models\User;
 use App\Models\Review;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class LikeTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * A basic feature test example.
      */
@@ -41,7 +41,7 @@ class LikeTest extends TestCase
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)
-            ->post("/reviews/99/like");
+            ->post('/reviews/99/like');
 
         $response->assertStatus(404);
     }

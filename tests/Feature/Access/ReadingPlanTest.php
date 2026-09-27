@@ -2,14 +2,15 @@
 
 namespace Tests\Feature\Access;
 
+use App\Models\ReadingPlan;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use App\Models\User;
-use App\Models\ReadingPlan;
 
 class ReadingPlanTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * A basic feature test example.
      */
@@ -65,5 +66,4 @@ class ReadingPlanTest extends TestCase
 
         $response->assertStatus(200);
     }
-
 }

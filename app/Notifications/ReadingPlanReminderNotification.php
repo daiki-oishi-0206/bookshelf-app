@@ -16,8 +16,7 @@ class ReadingPlanReminderNotification extends Notification
     public function __construct(
         public ReadingPlan $readingPlan,
         public string $timing
-    ){
-    }
+    ) {}
 
     /**
      * Get the notification's delivery channels.
@@ -33,7 +32,7 @@ class ReadingPlanReminderNotification extends Notification
     {
         $bookTitle = $this->readingPlan->book->title;
 
-        $body = match ($this->timing){
+        $body = match ($this->timing) {
             'three_days_before' => "「{$bookTitle}」の期日まであと3日です",
             'on_due_date' => "「{$bookTitle}」の期日です",
             'three_days_after' => "「{$bookTitle}」の期日を3日過ぎています",
@@ -46,6 +45,4 @@ class ReadingPlanReminderNotification extends Notification
             'timing' => $this->timing,
         ];
     }
-
 }
-

@@ -3,12 +3,12 @@
 namespace Tests\Feature\Access;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class RankingTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * A basic feature test example.
      */

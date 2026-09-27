@@ -2,16 +2,16 @@
 
 namespace Tests\Feature\CRUD;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
-use App\Models\User;
-use App\Models\Genre;
 use App\Models\Book;
+use App\Models\Genre;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class GenreTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * A basic feature test example.
      */
@@ -100,7 +100,7 @@ class GenreTest extends TestCase
     {
         $user = User::factory()->create();
         $genre = Genre::factory()->create([
-            'name' => '小説'
+            'name' => '小説',
         ]);
 
         $data = [
@@ -121,7 +121,7 @@ class GenreTest extends TestCase
     {
         $user = User::factory()->create();
         $genre = Genre::factory()->create([
-            'name' => '小説'
+            'name' => '小説',
         ]);
 
         $data = [
@@ -137,8 +137,6 @@ class GenreTest extends TestCase
             'name' => '小説',
         ]);
     }
-
-
 
     public function test_ジャンル編集時のバリデーション(): void
     {
@@ -195,7 +193,7 @@ class GenreTest extends TestCase
     public function test_未ログインでジャンルを編集できない(): void
     {
         $genre = Genre::factory()->create([
-            'name' => '小説'
+            'name' => '小説',
         ]);
         $data = [
             'name' => 'ビジネス',
@@ -214,7 +212,7 @@ class GenreTest extends TestCase
     {
         $user = User::factory()->create();
         $genre = Genre::factory()->create([
-            'name' => '小説'
+            'name' => '小説',
         ]);
 
         $response = $this->actingAs($user)->delete("/genres/{$genre->id}");
@@ -232,7 +230,7 @@ class GenreTest extends TestCase
         $user = User::factory()->create();
         $book = Book::factory()->create();
         $genre = Genre::factory()->create([
-            'name' => '小説'
+            'name' => '小説',
         ]);
         $book->genres()->attach($genre->id);
 
@@ -250,7 +248,7 @@ class GenreTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->delete("/genres/99");
+        $response = $this->actingAs($user)->delete('/genres/99');
 
         $response->assertStatus(404);
 
@@ -262,7 +260,7 @@ class GenreTest extends TestCase
     public function test_未ログインでジャンルを削除できない(): void
     {
         $genre = Genre::factory()->create([
-            'name' => '小説'
+            'name' => '小説',
         ]);
 
         $response = $this->delete("/genres/{$genre->id}");
@@ -274,5 +272,4 @@ class GenreTest extends TestCase
             'name' => '小説',
         ]);
     }
-
 }

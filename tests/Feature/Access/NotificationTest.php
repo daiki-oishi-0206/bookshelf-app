@@ -2,15 +2,16 @@
 
 namespace Tests\Feature\Access;
 
+use App\Models\ReadingPlan;
+use App\Models\User;
+use App\Notifications\ReadingPlanReminderNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use App\Models\User;
-use App\Models\ReadingPlan;
-use App\Notifications\ReadingPlanReminderNotification;
 
 class NotificationTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * A basic feature test example.
      */
@@ -47,7 +48,7 @@ class NotificationTest extends TestCase
         );
 
         $response = $this->actingAs($user)->get('/notifications');
-        
+
         $response->assertStatus(200);
 
         $response->assertDontSee($readingPlan->book->title);

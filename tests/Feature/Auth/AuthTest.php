@@ -2,14 +2,14 @@
 
 namespace Tests\Feature\Auth;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class AuthTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * A basic feature test example.
      */
@@ -83,7 +83,7 @@ class AuthTest extends TestCase
 
             'メールアドレス文字数超過' => [
                 'data' => [
-                    'email' => str_repeat('a', 256) . '@example.com',
+                    'email' => str_repeat('a', 256).'@example.com',
                 ],
                 'errors' => [
                     'email',
@@ -174,7 +174,7 @@ class AuthTest extends TestCase
 
             'メールアドレス文字数超過' => [
                 'data' => [
-                    'email' => str_repeat('a', 256) . '@example.com',
+                    'email' => str_repeat('a', 256).'@example.com',
                 ],
                 'errors' => [
                     'email',
@@ -264,4 +264,3 @@ class AuthTest extends TestCase
         $response->assertRedirect('/login');
     }
 }
-

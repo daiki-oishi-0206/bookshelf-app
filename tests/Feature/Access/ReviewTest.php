@@ -2,15 +2,15 @@
 
 namespace Tests\Feature\Access;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
-use App\Models\User;
 use App\Models\Review;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class ReviewTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * A basic feature test example.
      */

@@ -2,14 +2,15 @@
 
 namespace Tests\Feature\CRUD;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 use App\Models\Book;
 use App\Models\Genre;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class SearchTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * A basic feature test example.
      */
@@ -63,7 +64,7 @@ class SearchTest extends TestCase
         $otherGenre = Genre::factory()->create([
             'name' => 'ビジネス',
         ]);
-        
+
         $book = Book::factory()->create([
             'title' => 'テスト書籍',
         ]);
@@ -116,6 +117,7 @@ class SearchTest extends TestCase
 
         $response->assertStatus(200);
     }
+
     public function test_検索結果を次のページに切り替える(): void
     {
         Book::factory()->create([
@@ -180,7 +182,7 @@ class SearchTest extends TestCase
     {
         Genre::factory()->create();
 
-        $response = $this->get("/?genre=99");
+        $response = $this->get('/?genre=99');
 
         $response->assertStatus(302);
 
@@ -189,12 +191,10 @@ class SearchTest extends TestCase
 
     public function test_不正なページ番号を指定して検索する(): void
     {
-        $response = $this->get("/?page=0");
+        $response = $this->get('/?page=0');
 
         $response->assertStatus(302);
 
         $response->assertSessionHasErrors('page');
     }
-
 }
-

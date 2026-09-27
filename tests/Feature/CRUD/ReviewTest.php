@@ -2,32 +2,32 @@
 
 namespace Tests\Feature\CRUD;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
+use App\Models\Book;
 use App\Models\Review;
 use App\Models\User;
-use App\Models\Book;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class ReviewTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * A basic feature test example.
      */
     public function test_評価を入力してレビューを投稿できる(): void
     {
-        
+
         $user = User::factory()->create();
         $book = Book::factory()->create();
         $data = [
             'rating' => 5,
-            'comment' => NULL,
+            'comment' => null,
         ];
 
         $response = $this->actingAs($user)
-        ->from("/books/{$book->id}")
-        ->post("/books/{$book->id}/review", $data);
+            ->from("/books/{$book->id}")
+            ->post("/books/{$book->id}/review", $data);
 
         $response->assertRedirect("/books/{$book->id}");
 
@@ -35,7 +35,7 @@ class ReviewTest extends TestCase
             'user_id' => $user->id,
             'book_id' => $book->id,
             'rating' => 5,
-            'comment' => NULL,
+            'comment' => null,
         ]);
     }
 
@@ -49,8 +49,8 @@ class ReviewTest extends TestCase
         ];
 
         $response = $this->actingAs($user)
-        ->from("/books/{$book->id}")
-        ->post("/books/{$book->id}/review", $data);
+            ->from("/books/{$book->id}")
+            ->post("/books/{$book->id}/review", $data);
 
         $response->assertRedirect("/books/{$book->id}");
 
@@ -158,12 +158,12 @@ class ReviewTest extends TestCase
             'user_id' => $user->id,
             'book_id' => $book->id,
             'rating' => 1,
-            'comment' => NULL,
+            'comment' => null,
         ]);
 
         $data = [
             'rating' => 5,
-            'comment' => NULL,
+            'comment' => null,
         ];
 
         $response = $this->actingAs($user)
@@ -176,7 +176,7 @@ class ReviewTest extends TestCase
             'user_id' => $user->id,
             'book_id' => $book->id,
             'rating' => 5,
-            'comment' => NULL,
+            'comment' => null,
         ]);
     }
 
@@ -190,7 +190,7 @@ class ReviewTest extends TestCase
             'user_id' => $user->id,
             'book_id' => $book->id,
             'rating' => 1,
-            'comment' => NULL,
+            'comment' => null,
         ]);
 
         $data = [
@@ -295,7 +295,7 @@ class ReviewTest extends TestCase
             'user_id' => $user->id,
             'book_id' => $book->id,
             'rating' => 3,
-            'comment' => NULL,
+            'comment' => null,
         ]);
 
         $data = [
@@ -310,7 +310,7 @@ class ReviewTest extends TestCase
         $this->assertDatabaseHas('reviews', [
             'id' => $review->id,
             'rating' => 3,
-            'comment' => NULL,
+            'comment' => null,
         ]);
     }
 
@@ -362,7 +362,7 @@ class ReviewTest extends TestCase
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)
-            ->delete("/reviews/99");
+            ->delete('/reviews/99');
 
         $response->assertStatus(404);
 
@@ -390,5 +390,4 @@ class ReviewTest extends TestCase
             'id' => $review->id,
         ]);
     }
-
 }

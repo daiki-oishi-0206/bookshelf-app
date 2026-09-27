@@ -85,13 +85,11 @@ return [
 
     'uuid' => ':attributeは有効なUUIDである必要があります。',
 
-
     'custom' => [
         'attribute-name' => [
             'rule-name' => 'custom-message',
         ],
     ],
-
 
     'attributes' => [
         'title' => 'タイトル',

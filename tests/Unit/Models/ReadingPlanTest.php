@@ -2,20 +2,21 @@
 
 namespace Tests\Unit\Models;
 
+use App\Enums\ReadingPlanStatus;
+use App\Models\Book;
 use App\Models\ReadingPlan;
 use App\Models\User;
-use App\Models\Book;
-use App\Enums\ReadingPlanStatus;
-use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class ReadingPlanTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * A basic unit test example.
      */
-    public function test_ReadingPlanモデルの正常動作(): void
+    public function test_reading_planモデルの正常動作(): void
     {
         $readingPlan = ReadingPlan::factory()->create();
 
@@ -24,7 +25,7 @@ class ReadingPlanTest extends TestCase
         ]);
     }
 
-    public function test_ReadingPlanモデルのリレーション(): void
+    public function test_reading_planモデルのリレーション(): void
     {
         $user = User::factory()->create();
 
@@ -41,7 +42,7 @@ class ReadingPlanTest extends TestCase
         $this->assertEquals($book->id, $readingPlan->book->id);
     }
 
-    public function test_ReadingPlanモデルのscope(): void
+    public function test_reading_planモデルのscope(): void
     {
 
         ReadingPlan::factory()->create([
@@ -54,7 +55,6 @@ class ReadingPlanTest extends TestCase
 
         $readingPlans = ReadingPlan::reading()->get();
         $completedPlans = ReadingPlan::completed()->get();
-
 
         $this->assertCount(1, $readingPlans);
         $this->assertEquals(

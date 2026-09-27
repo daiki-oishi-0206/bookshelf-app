@@ -2,15 +2,15 @@
 
 namespace Tests\Feature\CRUD;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
-use App\Models\User;
 use App\Models\Book;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class FavoriteTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * A basic feature test example.
      */
@@ -61,7 +61,7 @@ class FavoriteTest extends TestCase
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)
-            ->post("/books/99/favorite");
+            ->post('/books/99/favorite');
 
         $response->assertStatus(404);
     }
@@ -114,5 +114,4 @@ class FavoriteTest extends TestCase
             'book_id' => $book->id,
         ]);
     }
-
 }

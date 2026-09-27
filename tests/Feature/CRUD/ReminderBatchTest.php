@@ -2,16 +2,17 @@
 
 namespace Tests\Feature\CRUD;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use App\Models\User;
 use App\Models\ReadingPlan;
+use App\Models\User;
 use App\Notifications\ReadingPlanReminderNotification;
 use Carbon\Carbon;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class ReminderBatchTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * A basic feature test example.
      */

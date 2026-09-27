@@ -2,18 +2,19 @@
 
 namespace Tests\Unit\Models;
 
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Models\Genre;
 use App\Models\Book;
+use App\Models\Genre;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class GenreTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * A basic unit test example.
      */
-    public function test_Genreモデルが正常に保存できる(): void
+    public function test_genreモデルが正常に保存できる(): void
     {
         $genre = Genre::factory()->create();
 
@@ -22,7 +23,7 @@ class GenreTest extends TestCase
         ]);
     }
 
-    public function test_Genreモデルのリレーションが正しく取得できる(): void
+    public function test_genreモデルのリレーションが正しく取得できる(): void
     {
         $book = Book::factory()->create();
 

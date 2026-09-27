@@ -2,17 +2,17 @@
 
 namespace Tests\Feature\CRUD;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use App\Models\User;
 use App\Models\Book;
 use App\Models\ReadingPlan;
+use App\Models\User;
 use Carbon\Carbon;
-
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class ReadingPlanTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * A basic feature test example.
      */
@@ -342,4 +342,3 @@ class ReadingPlanTest extends TestCase
         ]);
     }
 }
-

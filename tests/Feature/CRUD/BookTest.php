@@ -2,11 +2,11 @@
 
 namespace Tests\Feature\CRUD;
 
+use App\Models\Book;
+use App\Models\Genre;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use App\Models\User;
-use App\Models\Genre;
-use App\Models\Book;
 
 class BookTest extends TestCase
 {
@@ -46,8 +46,6 @@ class BookTest extends TestCase
             'genre_id' => $genre->id,
         ]);
     }
-
-
 
     public function test_書籍登録時のバリデーション(): void
     {
@@ -139,15 +137,15 @@ class BookTest extends TestCase
 
         ];
 
-        foreach($testCase as $case){
+        foreach ($testCase as $case) {
             $data = array_merge($validData, $case['data']);
 
-            if(!empty($case['createBook'])){
+            if (! empty($case['createBook'])) {
                 Book::factory()->create([
                     'isbn' => '9781234567890',
                 ]);
             }
-            
+
             $response = $this->actingAs($user)->post('/books', $data);
 
             $response->assertSessionHasErrors($case['errors']);
@@ -175,7 +173,6 @@ class BookTest extends TestCase
             'isbn' => '9781234567890',
         ]);
     }
-
 
     public function test_必須項目を入力して書籍を更新できる(): void
     {
@@ -225,7 +222,7 @@ class BookTest extends TestCase
         ]);
     }
 
-    public function test_更新対象自身のISBNを維持して書籍を更新できる(): void
+    public function test_更新対象自身の_isb_nを維持して書籍を更新できる(): void
     {
         $user = User::factory()->create();
         $genre = Genre::factory()->create();
@@ -363,7 +360,7 @@ class BookTest extends TestCase
         foreach ($testCases as $case) {
             $data = array_merge($validData, $case['data']);
 
-            if (!empty($case['createBook'])) {
+            if (! empty($case['createBook'])) {
                 Book::factory()->create([
                     'isbn' => '9781111111111',
                 ]);
@@ -375,7 +372,6 @@ class BookTest extends TestCase
             $response->assertSessionHasErrors($case['errors']);
         }
     }
-
 
     public function test_未ログインで書籍を更新できない(): void
     {
@@ -458,7 +454,7 @@ class BookTest extends TestCase
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)
-            ->delete("/books/99");
+            ->delete('/books/99');
 
         $response->assertStatus(404);
 
@@ -489,5 +485,4 @@ class BookTest extends TestCase
             'genre_id' => $genre->id,
         ]);
     }
-
 }

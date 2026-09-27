@@ -7,7 +7,6 @@ use Illuminate\Validation\Rule;
 
 class UpdateBookRequest extends FormRequest
 {
-
     public function authorize(): bool
     {
         return true;
@@ -26,7 +25,6 @@ class UpdateBookRequest extends FormRequest
             'genres.*' => ['exists:genres,id'],
         ];
     }
-
 
     public function messages(): array
     {

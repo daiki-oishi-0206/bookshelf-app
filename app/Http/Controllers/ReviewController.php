@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Book;
-use App\Models\Review;
-use Illuminate\Http\Request;
-use Illuminate\View\View;
 use App\Http\Requests\StoreReviewRequest;
 use App\Http\Requests\UpdateReviewRequest;
+use App\Models\Book;
+use App\Models\Review;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class ReviewController extends Controller
 {
@@ -44,7 +43,7 @@ class ReviewController extends Controller
     public function edit(Review $review): View
     {
         $this->authorize('update', $review);
-        
+
         return view('reviews.edit', compact('review'));
     }
 
@@ -65,7 +64,7 @@ class ReviewController extends Controller
     public function destroy(Review $review): RedirectResponse
     {
         $this->authorize('delete', $review);
-        
+
         $review->delete();
 
         return redirect()

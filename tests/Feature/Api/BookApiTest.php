@@ -2,16 +2,16 @@
 
 namespace Tests\Feature\Api;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
 use App\Models\Book;
 use App\Models\Genre;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class BookApiTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * A basic feature test example.
      */
@@ -73,7 +73,7 @@ class BookApiTest extends TestCase
         ]);
     }
 
-    public function test_ジャンルIDを指定して書籍一覧を取得できる(): void
+    public function test_ジャンル_i_dを指定して書籍一覧を取得できる(): void
     {
         $genre1 = Genre::factory()->create([
             'name' => '小説',
@@ -223,7 +223,7 @@ class BookApiTest extends TestCase
         foreach ($testCases as $case) {
             $data = array_merge($validData, $case['data']);
 
-            $response = $this->getJson('/api/v1/books?' . http_build_query($data));
+            $response = $this->getJson('/api/v1/books?'.http_build_query($data));
 
             $response->assertStatus(422);
 
@@ -269,7 +269,7 @@ class BookApiTest extends TestCase
         $response->assertStatus(404);
 
         $response->assertJson([
-            'error' => '書籍が見つかりませんでした。',
+            'error' => '書籍が見つかりませんでした',
         ]);
     }
 
@@ -323,7 +323,7 @@ class BookApiTest extends TestCase
             'author' => '山田太郎',
             'isbn' => '9781234567891',
             'published_date' => '2025-01-01',
-            'description' => 'Laravelの入門書です。',
+            'description' => 'Laravelの入門書です',
             'image_url' => 'https://example.com/book.jpg',
             'genres' => [$genre->id],
         ];
@@ -476,7 +476,7 @@ class BookApiTest extends TestCase
         ]);
     }
 
-    public function test_自身のISBN13を維持して書籍を更新できる(): void
+    public function test_自身の_isb_n13を維持して書籍を更新できる(): void
     {
         $user = User::factory()->create();
 
@@ -543,7 +543,7 @@ class BookApiTest extends TestCase
             'author' => '鈴木一郎',
             'isbn' => '9781234567892',
             'published_date' => '2021-01-01',
-            'description' => 'Laravelの実践書です。',
+            'description' => 'Laravelの実践書です',
             'image_url' => 'https://example.com/book.jpg',
             'genres' => [$genre->id],
         ];
@@ -659,7 +659,7 @@ class BookApiTest extends TestCase
             'author' => '鈴木一郎',
             'isbn' => '9781234567892',
             'published_date' => '2021-01-01',
-            'description' => 'Laravelの実践書です。',
+            'description' => 'Laravelの実践書です',
             'image_url' => 'https://example.com/book.jpg',
             'genres' => [$genre->id],
         ];
@@ -672,7 +672,7 @@ class BookApiTest extends TestCase
         $response->assertStatus(404);
 
         $response->assertJson([
-            'error' => '書籍が見つかりませんでした。',
+            'error' => '書籍が見つかりませんでした',
         ]);
     }
 
@@ -704,7 +704,7 @@ class BookApiTest extends TestCase
         $response->assertStatus(404);
 
         $response->assertJson([
-            'error' => '書籍が見つかりませんでした。',
+            'error' => '書籍が見つかりませんでした',
         ]);
     }
 

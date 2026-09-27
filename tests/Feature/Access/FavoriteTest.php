@@ -2,14 +2,14 @@
 
 namespace Tests\Feature\Access;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class FavoriteTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * A basic feature test example.
      */

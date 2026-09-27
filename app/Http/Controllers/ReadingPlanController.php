@@ -5,13 +5,13 @@ namespace App\Http\Controllers;
 use App\Enums\ReadingPlanStatus;
 use App\Http\Requests\StoreReadingPlanRequest;
 use App\Http\Requests\UpdateReadingPlanRequest;
-use Illuminate\Http\Request;
-use Illuminate\View\View;
 use App\Models\Book;
 use App\Models\ReadingPlan;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class ReadingPlanController extends Controller
 {
@@ -38,6 +38,7 @@ class ReadingPlanController extends Controller
     public function create(): View
     {
         $books = Book::all();
+
         return view('reading-plans.create', compact('books'));
     }
 
@@ -97,5 +98,3 @@ class ReadingPlanController extends Controller
             ->with('success', '読書計画を読了にしました');
     }
 }
-
-

@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Book;
 use App\Models\Genre;
 use App\Models\User;
+use Illuminate\Database\Seeder;
 
 class BookSeeder extends Seeder
 {
@@ -44,7 +44,6 @@ class BookSeeder extends Seeder
         $genres = Genre::whereIn('name', ['ビジネス', '自己啓発'])->pluck('id');
         $book->genres()->sync($genres);
 
-
         $book = Book::firstOrCreate(
             ['isbn' => '9784873115658'],
             [
@@ -73,7 +72,6 @@ class BookSeeder extends Seeder
         $genres = Genre::whereIn('name', ['ビジネス', '自己啓発'])->pluck('id');
         $book->genres()->sync($genres);
 
-
         $book = Book::firstOrCreate(
             ['isbn' => '9784101010021'],
             [
@@ -87,7 +85,6 @@ class BookSeeder extends Seeder
         );
         $genres = Genre::whereIn('name', ['小説'])->pluck('id');
         $book->genres()->sync($genres);
-
 
         $book = Book::firstOrCreate(
             ['isbn' => '9784309226712'],
@@ -131,7 +128,6 @@ class BookSeeder extends Seeder
         $genres = Genre::whereIn('name', ['自己啓発'])->pluck('id');
         $book->genres()->sync($genres);
 
-
         $book = Book::firstOrCreate(
             ['isbn' => '9784163902302'],
             [
@@ -146,7 +142,6 @@ class BookSeeder extends Seeder
         $genres = Genre::whereIn('name', ['小説'])->pluck('id');
         $book->genres()->sync($genres);
 
-
         $book = Book::firstOrCreate(
             ['isbn' => '9784822289607'],
             [
@@ -160,7 +155,6 @@ class BookSeeder extends Seeder
         );
         $genres = Genre::whereIn('name', ['ビジネス', '科学'])->pluck('id');
         $book->genres()->sync($genres);
-
 
         $book = Book::firstOrCreate(
             ['isbn' => '9784822251468'],
@@ -177,4 +171,3 @@ class BookSeeder extends Seeder
         $book->genres()->sync($genres);
     }
 }
-
