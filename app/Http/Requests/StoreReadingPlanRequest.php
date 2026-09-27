@@ -31,9 +31,8 @@ class StoreReadingPlanRequest extends FormRequest
                 Rule::unique('reading_plans', 'book_id')
                     ->where('user_id', auth()->id())
                     ->whereIn('status', [
-                        ReadingPlanStatus::NOT_STARTED->value,
-                        ReadingPlanStatus::READING->value,
-                        ReadingPlanStatus::OVERDUE->value,
+                        ReadingPlanStatus::Reading->value,
+                        ReadingPlanStatus::Overdue->value,
                     ]),
             ],
             'target_date' => ['required', 'date', 'after_or_equal:today'],
@@ -52,4 +51,6 @@ class StoreReadingPlanRequest extends FormRequest
             'target_date.after_or_equal' => '期日は今日以降の日付を指定してください',
         ];
     }
+
+    
 }

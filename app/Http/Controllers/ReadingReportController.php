@@ -68,4 +68,3 @@ class ReadingReportController extends Controller
     }
 }
 
-

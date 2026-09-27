@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreBookRequest;
-use Illuminate\Http\Request;
 use App\Models\Book;
 use App\Models\Genre;
 use Illuminate\View\View;
@@ -13,6 +12,8 @@ use App\Http\Requests\UpdateBookRequest;
 use App\Http\Requests\IndexBookRequest;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Http\Client\ConnectionException;
+
 
 
 
@@ -48,9 +49,10 @@ class BookController extends Controller
         }
 
 
-        $books = $query->withQueryString()->paginate(10);
+        $books = $query->paginate(10)->withQueryString();
+        $genres = Genre::all();
             
-        return view('books.index', compact('books'));
+        return view('books.index', compact('books', 'genres'));
     }
 
     public function create(): View
@@ -62,13 +64,19 @@ class BookController extends Controller
 
     public function isbnSearch(string $isbn)
     {
-        $response = Http::get('https://www.googleapis.com/books/v1/volumes', [
-            'q' => 'isbn:' . $isbn,
-        ]);
+        try {
+            $response = Http::get('https://www.googleapis.com/books/v1/volumes', [
+                'q' => 'isbn:' . $isbn,
+            ]);
 
-        if ($response->failed()) {
+            if ($response->failed()) {
+                return response()->json([
+                    'error' => 'Google Books APIとの通信に失敗しました',
+                ], 500);
+            }
+        } catch (ConnectionException $e) {
             return response()->json([
-                'error' => 'Google Books APIとの通信に失敗しました。',
+                'error' => 'Google Books APIとの通信に失敗しました',
             ], 500);
         }
 
@@ -76,7 +84,7 @@ class BookController extends Controller
 
         if (empty($data['items'])) {
             return response()->json([
-                'error' => '書籍情報が見つかりませんでした。',
+                'error' => '書籍情報が見つかりませんでした',
             ], 404);
         }
 

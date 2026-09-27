@@ -3,7 +3,6 @@
 namespace Tests\Feature\CRUD;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Genre;
@@ -24,8 +23,8 @@ class BookTest extends TestCase
         $data = [
             'title' => 'テスト書籍',
             'author' => 'テスト著者',
-            'isbn' => '9781234567890',
-            'published_date' => '2026-01-01',
+            'isbn' => null,
+            'published_date' => null,
             'description' => null,
             'image_url' => null,
             'genres' => [$genre->id],
@@ -38,12 +37,10 @@ class BookTest extends TestCase
         $this->assertDatabaseHas('books', [
             'title' => 'テスト書籍',
             'author' => 'テスト著者',
-            'isbn' => '9781234567890',
-            'published_date' => '2026-01-01',
             'user_id' => $user->id,
         ]);
 
-        $book = Book::where('isbn', '9781234567890')->first();
+        $book = Book::where('title', 'テスト書籍')->first();
         $this->assertDatabaseHas('book_genre', [
             'book_id' => $book->id,
             'genre_id' => $genre->id,
@@ -60,8 +57,8 @@ class BookTest extends TestCase
         $validData = [
             'title' => 'テスト書籍',
             'author' => 'テスト著者',
-            'isbn' => '9781234567890',
-            'published_date' => '2026-01-01',
+            'isbn' => null,
+            'published_date' => null,
             'description' => null,
             'image_url' => null,
             'genres' => [$genre->id],
@@ -72,15 +69,11 @@ class BookTest extends TestCase
                 'data' => [
                     'title' => '',
                     'author' => '',
-                    'isbn' => '',
-                    'published_date' => '',
                     'genres' => [],
                 ],
                 'errors' => [
                     'title',
                     'author',
-                    'isbn',
-                    'published_date',
                     'genres',
                 ],
             ],
@@ -166,8 +159,8 @@ class BookTest extends TestCase
         $data = [
             'title' => 'テスト書籍',
             'author' => 'テスト著者',
-            'isbn' => '9781234567890',
-            'published_date' => '2026-01-01',
+            'isbn' => null,
+            'published_date' => null,
             'description' => null,
             'image_url' => null,
             'genres' => [],
@@ -200,8 +193,6 @@ class BookTest extends TestCase
             'user_id' => $user->id,
             'title' => '変更前の書籍',
             'author' => '変更前の著者',
-            'isbn' => '9780000000001',
-            'published_date' => '2025-01-01',
         ]);
 
         $book->genres()->attach($genre->id);
@@ -209,8 +200,8 @@ class BookTest extends TestCase
         $data = [
             'title' => '変更後の書籍',
             'author' => '変更後の著者',
-            'isbn' => '9781234567890',
-            'published_date' => '2026-01-01',
+            'isbn' => null,
+            'published_date' => null,
             'description' => null,
             'image_url' => null,
             'genres' => [$updateGenre->id],
@@ -225,8 +216,6 @@ class BookTest extends TestCase
             'id' => $book->id,
             'title' => '変更後の書籍',
             'author' => '変更後の著者',
-            'isbn' => '9781234567890',
-            'published_date' => '2026-01-01',
             'user_id' => $user->id,
         ]);
 
@@ -283,8 +272,6 @@ class BookTest extends TestCase
             'user_id' => $user->id,
             'title' => '変更前の書籍',
             'author' => '変更前の著者',
-            'isbn' => '9780000000001',
-            'published_date' => '2025-01-01',
         ]);
 
         $book->genres()->attach($genre->id);
@@ -292,8 +279,8 @@ class BookTest extends TestCase
         $validData = [
             'title' => '更新後の書籍',
             'author' => '更新後の著者',
-            'isbn' => '9781234567890',
-            'published_date' => '2026-01-01',
+            'isbn' => null,
+            'published_date' => null,
             'description' => null,
             'image_url' => null,
             'genres' => [$genre->id],
@@ -304,15 +291,11 @@ class BookTest extends TestCase
                 'data' => [
                     'title' => '',
                     'author' => '',
-                    'isbn' => '',
-                    'published_date' => '',
                     'genres' => [],
                 ],
                 'errors' => [
                     'title',
                     'author',
-                    'isbn',
-                    'published_date',
                     'genres',
                 ],
             ],
