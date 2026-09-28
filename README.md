@@ -385,9 +385,18 @@ sail artisan test
 
 Laravel Pintを使用してコードフォーマットを実施しています。
 
+### コードフォーマット
+
 ```bash
 sail pint
 ```
+
+### コードフォーマットの確認
+
+```bash
+sail pint --test
+```
+
 
 ## 作成者
 
