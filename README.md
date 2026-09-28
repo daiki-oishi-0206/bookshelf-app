@@ -350,9 +350,9 @@ cronによる処理を実行するには、Dockerコンテナが起動してい�
 
 | 技術               | 内容           |
 | ---------------- | ------------ |
-| PHP              | 8.x          |
+| PHP              | 8.5          |
 | Laravel          | 10.x         |
-| MySQL            | 8.0          |
+| MySQL            | 8.4          |
 | Docker           | Laravel Sail |
 | Tailwind CSS     | CSSフレームワーク   |
 | Alpine.js        | JavaScript   |
