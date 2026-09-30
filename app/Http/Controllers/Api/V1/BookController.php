@@ -12,6 +12,7 @@ use App\Models\Book;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class BookController extends Controller
 {
@@ -59,12 +60,13 @@ class BookController extends Controller
 
         $data['user_id'] = Auth::id();
 
-        $book = Book::create($data);
+        DB::transaction(function () use ($data, $genres) {
+            $book = Book::create($data);
 
-        $book->genres()->attach($genres);
+            $book->genres()->attach($genres);
+        });
 
         return response('', 201);
-
     }
 
     /**
@@ -88,10 +90,14 @@ class BookController extends Controller
     public function update(UpdateBookRequest $request, Book $book): Response
     {
         $this->authorize('update', $book);
-        $data = $request->validated();
-        $book->update($data);
 
-        $book->genres()->sync($request->genres);
+        $data = $request->validated();
+
+        DB::transaction(function () use ($book, $data, $request) {
+            $book->update($data);
+
+            $book->genres()->sync($request->genres);
+        });
 
         return response('', 200);
     }

@@ -9,13 +9,18 @@ use App\Models\Book;
 use App\Models\Genre;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\View\View;
 
 class BookController extends Controller
 {
+    /**
+     * 書籍一覧を検索・絞り込み・並び替えして表示する。
+     */
     public function index(IndexBookRequest $request): View
     {
         $query = Book::query()
@@ -59,7 +64,10 @@ class BookController extends Controller
         return view('books.create', compact('genres'));
     }
 
-    public function isbnSearch(string $isbn)
+    /**
+     * ISBNを使用してGoogle Books APIから書籍情報を取得する。
+     */
+    public function isbnSearch(string $isbn): JsonResponse
     {
         try {
             $response = Http::get('https://www.googleapis.com/books/v1/volumes', [
@@ -98,17 +106,19 @@ class BookController extends Controller
 
     public function store(StoreBookRequest $request): RedirectResponse
     {
-        $book = Book::create([
-            'title' => $request->title,
-            'author' => $request->author,
-            'isbn' => $request->isbn,
-            'published_date' => $request->published_date,
-            'description' => $request->description,
-            'image_url' => $request->image_url,
-            'user_id' => Auth::id(),
-        ]);
+        DB::transaction(function () use ($request) {
+            $book = Book::create([
+                'title' => $request->title,
+                'author' => $request->author,
+                'isbn' => $request->isbn,
+                'published_date' => $request->published_date,
+                'description' => $request->description,
+                'image_url' => $request->image_url,
+                'user_id' => Auth::id(),
+            ]);
 
-        $book->genres()->sync($request->genres);
+            $book->genres()->sync($request->genres);
+        });
 
         return redirect()
             ->route('books.index')
@@ -133,16 +143,18 @@ class BookController extends Controller
     {
         $this->authorize('update', $book);
 
-        $book->update([
-            'title' => $request->title,
-            'author' => $request->author,
-            'isbn' => $request->isbn,
-            'published_date' => $request->published_date,
-            'description' => $request->description,
-            'image_url' => $request->image_url,
-        ]);
+        DB::transaction(function () use ($request, $book) {
+            $book->update([
+                'title' => $request->title,
+                'author' => $request->author,
+                'isbn' => $request->isbn,
+                'published_date' => $request->published_date,
+                'description' => $request->description,
+                'image_url' => $request->image_url,
+            ]);
 
-        $book->genres()->sync($request->genres);
+            $book->genres()->sync($request->genres);
+        });
 
         return redirect()
             ->route('books.show', $book)

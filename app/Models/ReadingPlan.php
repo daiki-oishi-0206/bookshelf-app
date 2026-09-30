@@ -6,6 +6,7 @@ use App\Enums\ReadingPlanStatus;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ReadingPlan extends Model
 {
@@ -23,22 +24,22 @@ class ReadingPlan extends Model
         'target_date' => 'date',
     ];
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function book()
+    public function book(): BelongsTo
     {
         return $this->belongsTo(Book::class);
     }
 
-    public function scopeReading(Builder $query)
+    public function scopeReading(Builder $query): Builder
     {
         return $query->where('status', ReadingPlanStatus::Reading);
     }
 
-    public function scopeCompleted(Builder $query)
+    public function scopeCompleted(Builder $query): Builder
     {
         return $query->where('status', ReadingPlanStatus::Completed);
     }

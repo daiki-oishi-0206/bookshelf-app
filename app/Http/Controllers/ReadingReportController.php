@@ -6,6 +6,9 @@ use Illuminate\View\View;
 
 class ReadingReportController extends Controller
 {
+    /**
+     * ユーザーの読書記録を集計し、読書レポート画面を表示する。
+     */
     public function index(): View
     {
         $user = auth()->user();
