@@ -14,7 +14,7 @@ class ReviewTest extends TestCase
     /**
      * A basic feature test example.
      */
-    public function test_未ログインでレビュー編集画面にアクセスするとログイン画面へリダイレクトされる(): void
+    public function test_未ログインでレビュー編集画面にアクセス(): void
     {
         $review = Review::factory()->create();
 
@@ -23,7 +23,7 @@ class ReviewTest extends TestCase
         $response->assertRedirect('/login');
     }
 
-    public function test_ログイン済みでレビュー編集画面にアクセスできる(): void
+    public function test_ログイン済みでレビュー編集画面にアクセス(): void
     {
         $user = User::factory()->create();
         $review = Review::factory()->create([
@@ -35,7 +35,7 @@ class ReviewTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_他ユーザーのレビュー編集画面にアクセスすると403が返る(): void
+    public function test_他ユーザーのレビュー編集画面にアクセス(): void
     {
         $userA = User::factory()->create();
         $userB = User::factory()->create();

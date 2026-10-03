@@ -11,14 +11,14 @@ class BookTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_未ログインで書籍一覧画面にアクセスできる(): void
+    public function test_未ログインで書籍一覧画面にアクセス(): void
     {
         $response = $this->get('/');
 
         $response->assertStatus(200);
     }
 
-    public function test_未ログインで書籍詳細画面にアクセスできる(): void
+    public function test_未ログインで書籍詳細画面にアクセス(): void
     {
         $book = Book::factory()->create();
 
@@ -27,14 +27,14 @@ class BookTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_未ログインで書籍登録画面にアクセスするとログイン画面へリダイレクトされる(): void
+    public function test_未ログインで書籍登録画面にアクセス(): void
     {
         $response = $this->get('/books/create');
 
         $response->assertRedirect('/login');
     }
 
-    public function test_ログイン済みで書籍登録画面にアクセスできる(): void
+    public function test_ログイン済みで書籍登録画面にアクセス(): void
     {
         $user = User::factory()->create();
 
@@ -43,7 +43,7 @@ class BookTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_未ログインで書籍編集画面にアクセスするとログイン画面へリダイレクトされる(): void
+    public function test_未ログインで書籍編集画面にアクセス(): void
     {
         $book = Book::factory()->create();
 
@@ -52,7 +52,7 @@ class BookTest extends TestCase
         $response->assertRedirect('/login');
     }
 
-    public function test_ログイン済みで書籍編集画面にアクセスできる(): void
+    public function test_ログイン済みで書籍編集画面にアクセス(): void
     {
         $user = User::factory()->create();
         $book = Book::factory()->create([
@@ -64,7 +64,7 @@ class BookTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_他ユーザーの書籍編集画面にアクセスすると403が返る(): void
+    public function test_他ユーザーの書籍編集画面にアクセス(): void
     {
         $userA = User::factory()->create();
         $userB = User::factory()->create();
