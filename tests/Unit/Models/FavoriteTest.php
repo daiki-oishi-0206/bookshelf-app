@@ -15,7 +15,7 @@ class FavoriteTest extends TestCase
     /**
      * A basic unit test example.
      */
-    public function test_favoriteモデルが正常に保存できる(): void
+    public function test_Favoriteモデルの正常動作(): void
     {
         $user = User::factory()->create();
         $book = Book::factory()->create();
@@ -30,7 +30,7 @@ class FavoriteTest extends TestCase
         ]);
     }
 
-    public function test_favoriteモデルのリレーションが正しく取得できる(): void
+    public function test_Favoriteモデルのリレーション(): void
     {
         $user = User::factory()->create();
         $book = Book::factory()->create();

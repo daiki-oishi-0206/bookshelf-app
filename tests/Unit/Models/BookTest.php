@@ -17,7 +17,7 @@ class BookTest extends TestCase
     /**
      * A basic unit test example.
      */
-    public function test_bookモデルが正常に保存できる(): void
+    public function test_Bookモデルの正常動作(): void
     {
         $book = Book::factory()->create();
 
@@ -26,7 +26,7 @@ class BookTest extends TestCase
         ]);
     }
 
-    public function test_bookモデルのリレーションが正しく取得できる(): void
+    public function test_Bookモデルのリレーション(): void
     {
         $user = User::factory()->create();
 

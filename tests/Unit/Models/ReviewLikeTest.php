@@ -15,7 +15,7 @@ class ReviewLikeTest extends TestCase
     /**
      * A basic unit test example.
      */
-    public function test_review_likeモデルが正常に保存できる(): void
+    public function test_ReviewLikeモデルの正常動作(): void
     {
         $user = User::factory()->create();
         $review = Review::factory()->create([
@@ -31,7 +31,7 @@ class ReviewLikeTest extends TestCase
         ]);
     }
 
-    public function test_review_likeモデルのリレーションが正しく取得できる(): void
+    public function test_ReviewLikeモデルのリレーション(): void
     {
         $user = User::factory()->create();
         $review = Review::factory()->create([

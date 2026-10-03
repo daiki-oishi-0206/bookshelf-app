@@ -14,7 +14,7 @@ class GenreTest extends TestCase
     /**
      * A basic unit test example.
      */
-    public function test_genreモデルが正常に保存できる(): void
+    public function test_Genreモデルの正常動作(): void
     {
         $genre = Genre::factory()->create();
 
@@ -23,7 +23,7 @@ class GenreTest extends TestCase
         ]);
     }
 
-    public function test_genreモデルのリレーションが正しく取得できる(): void
+    public function test_Genreモデルのリレーション(): void
     {
         $book = Book::factory()->create();
 

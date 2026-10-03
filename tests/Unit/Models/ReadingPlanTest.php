@@ -16,7 +16,7 @@ class ReadingPlanTest extends TestCase
     /**
      * A basic unit test example.
      */
-    public function test_reading_planモデルの正常動作(): void
+    public function test_ReadingPlanモデルの正常動作(): void
     {
         $readingPlan = ReadingPlan::factory()->create();
 
@@ -25,7 +25,7 @@ class ReadingPlanTest extends TestCase
         ]);
     }
 
-    public function test_reading_planモデルのリレーション(): void
+    public function test_ReadingPlanモデルのリレーション(): void
     {
         $user = User::factory()->create();
 
@@ -42,7 +42,7 @@ class ReadingPlanTest extends TestCase
         $this->assertEquals($book->id, $readingPlan->book->id);
     }
 
-    public function test_reading_planモデルのscope(): void
+    public function test_ReadingPlanモデルのscope(): void
     {
 
         ReadingPlan::factory()->create([
