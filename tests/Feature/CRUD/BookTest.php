@@ -12,448 +12,390 @@ class BookTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * A basic feature test example.
-     */
-    public function test_必須項目を入力して書籍を登録できる(): void
-    {
-        $user = User::factory()->create();
-        $genre = Genre::factory()->create();
+    private User $user;
+    private Genre $genre;
+    private Book $book;
 
-        $data = [
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->user = User::factory()->create();
+        $this->genre = Genre::factory()->create();
+        $this->book = Book::factory()->create([
+            'user_id' => $this->user->id,
+            'isbn' => '9780000000001',
+        ]);
+        $this->book->genres()->attach($this->genre->id);
+    }
+
+    private function validBookData(): array
+    {
+        return [
             'title' => 'テスト書籍',
             'author' => 'テスト著者',
             'isbn' => null,
             'published_date' => null,
             'description' => null,
             'image_url' => null,
-            'genres' => [$genre->id],
+            'genres' => [$this->genre->id],
         ];
+    }
 
-        $response = $this->actingAs($user)->post('/books', $data);
+    public function test_必須項目を入力して書籍を登録(): void
+    {
+        $data = $this->validBookData();
+
+        $response = $this->actingAs($this->user)
+            ->post('/books', $data);
 
         $response->assertRedirect('/');
 
         $this->assertDatabaseHas('books', [
             'title' => 'テスト書籍',
             'author' => 'テスト著者',
-            'user_id' => $user->id,
+            'user_id' => $this->user->id,
         ]);
 
         $book = Book::where('title', 'テスト書籍')->first();
         $this->assertDatabaseHas('book_genre', [
             'book_id' => $book->id,
-            'genre_id' => $genre->id,
+            'genre_id' => $this->genre->id,
         ]);
     }
 
-    public function test_書籍登録時のバリデーション(): void
+    public function test_必須項目を未入力で登録(): void
     {
-        $user = User::factory()->create();
-        $genre = Genre::factory()->create();
+        $data = $this->validBookData();
 
-        $validData = [
-            'title' => 'テスト書籍',
-            'author' => 'テスト著者',
-            'isbn' => null,
-            'published_date' => null,
-            'description' => null,
-            'image_url' => null,
-            'genres' => [$genre->id],
-        ];
+        $data['title'] = '';
+        $data['author'] = '';
+        $data['isbn'] = '';
+        $data['published_date'] = '';
+        $data['genres'] = [];
 
-        $testCase = [
-            '必須項目未入力' => [
-                'data' => [
-                    'title' => '',
-                    'author' => '',
-                    'genres' => [],
-                ],
-                'errors' => [
-                    'title',
-                    'author',
-                    'genres',
-                ],
-            ],
+        $response = $this->actingAs($this->user)
+            ->post('/books', $data);
 
-            '文字超過' => [
-                'data' => [
-                    'title' => str_repeat('a', 256),
-                    'author' => str_repeat('a', 256),
-                    'description' => str_repeat('a', 1001),
-                ],
-                'errors' => [
-                    'title',
-                    'author',
-                    'description',
-                ],
-            ],
-
-            'ISBN桁数不正' => [
-                'data' => [
-                    'isbn' => '123456789012',
-                ],
-                'errors' => [
-                    'isbn',
-                ],
-            ],
-
-            'ISBN数字不正' => [
-                'data' => [
-                    'isbn' => '1234567890abc',
-                ],
-                'errors' => [
-                    'isbn',
-                ],
-            ],
-
-            'ISBN重複不正' => [
-                'data' => [
-                    'isbn' => '9781234567890',
-                ],
-                'errors' => [
-                    'isbn',
-                ],
-                'createBook' => true,
-            ],
-
-            '出版日不正' => [
-                'data' => [
-                    'published_date' => '2026-02-31',
-                ],
-                'errors' => [
-                    'published_date',
-                ],
-            ],
-
-            '画像URL不正' => [
-                'data' => [
-                    'image_url' => 'invalid-url',
-                ],
-                'errors' => [
-                    'image_url',
-                ],
-            ],
-
-        ];
-
-        foreach ($testCase as $case) {
-            $data = array_merge($validData, $case['data']);
-
-            if (! empty($case['createBook'])) {
-                Book::factory()->create([
-                    'isbn' => '9781234567890',
-                ]);
-            }
-
-            $response = $this->actingAs($user)->post('/books', $data);
-
-            $response->assertSessionHasErrors($case['errors']);
-        }
+        $response->assertSessionHasErrors([
+            'title',
+            'author',
+            'genres',
+        ]);
     }
 
-    public function test_未ログインで書籍を登録できない(): void
+    public function test_文字数制限を超えて登録(): void
     {
-        $data = [
-            'title' => 'テスト書籍',
-            'author' => 'テスト著者',
-            'isbn' => null,
-            'published_date' => null,
-            'description' => null,
-            'image_url' => null,
-            'genres' => [],
-        ];
+        $data = $this->validBookData();
+
+        $data['title'] = str_repeat('a', 256);
+        $data['author'] = str_repeat('a', 256);
+        $data['description'] = str_repeat('a', 1001);
+
+        $response = $this->actingAs($this->user)
+            ->post('/books', $data);
+
+        $response->assertSessionHasErrors([
+            'title',
+            'author',
+            'description',
+        ]);
+    }
+
+    public function test_ISBN13の桁数を12桁で登録(): void
+    {
+        $data = $this->validBookData();
+        $data['isbn'] = '123456789012';
+
+        $response = $this->actingAs($this->user)
+            ->post('/books', $data);
+
+        $response->assertSessionHasErrors(['isbn']);
+    }
+
+    public function test_ISBN13の桁数を14桁で登録(): void
+    {
+        $data = $this->validBookData();
+        $data['isbn'] = '12345678901234';
+
+        $response = $this->actingAs($this->user)
+            ->post('/books', $data);
+
+        $response->assertSessionHasErrors(['isbn']);
+    }
+
+    public function test_ISBN13を数字以外で登録(): void
+    {
+        $data = $this->validBookData();
+        $data['isbn'] = '1234567890abc';
+
+        $response = $this->actingAs($this->user)
+            ->post('/books', $data);
+
+        $response->assertSessionHasErrors(['isbn']);
+    }
+
+    public function test_登録済みのISBN13で登録(): void
+    {
+        $isbn = '9781234567890';
+
+        Book::factory()->create([
+            'isbn' => $isbn,
+        ]);
+
+        $data = $this->validBookData();
+        $data['isbn'] = $isbn;
+
+        $response = $this->actingAs($this->user)
+            ->post('/books', $data);
+
+        $response->assertSessionHasErrors(['isbn']);
+    }
+
+    public function test_出版日に不正な値を入力して登録(): void
+    {
+        $data = $this->validBookData();
+        $data['published_date'] = '2026-02-31';
+
+        $response = $this->actingAs($this->user)
+            ->post('/books', $data);
+
+        $response->assertSessionHasErrors(['published_date']);
+    }
+
+    public function test_画像URLに不正な値を入力して登録(): void
+    {
+        $data = $this->validBookData();
+        $data['image_url'] = 'invalid-url';
+
+        $response = $this->actingAs($this->user)
+            ->post('/books', $data);
+
+        $response->assertSessionHasErrors(['image_url']);
+    }
+
+    public function test_未ログインで書籍を登録(): void
+    {
+        $data = $this->validBookData();
 
         $response = $this->post('/books', $data);
 
         $response->assertRedirect('/login');
-
-        $this->assertDatabaseMissing('books', [
-            'title' => 'テスト書籍',
-            'isbn' => '9781234567890',
-        ]);
     }
 
-    public function test_必須項目を入力して書籍を更新できる(): void
+
+    public function test_必須項目を入力して書籍を更新(): void
     {
-        $user = User::factory()->create();
+        $data = $this->validBookData();
 
-        $genre = Genre::factory()->create([
-            'name' => '小説',
-        ]);
+        $data['title'] = '変更後の書籍';
+        $data['author'] = '変更後の著者';
 
-        $updateGenre = Genre::factory()->create([
-            'name' => 'ビジネス',
-        ]);
+        $response = $this->actingAs($this->user)
+            ->put("/books/{$this->book->id}", $data);
 
-        $book = Book::factory()->create([
-            'user_id' => $user->id,
-            'title' => '変更前の書籍',
-            'author' => '変更前の著者',
-        ]);
-
-        $book->genres()->attach($genre->id);
-
-        $data = [
-            'title' => '変更後の書籍',
-            'author' => '変更後の著者',
-            'isbn' => null,
-            'published_date' => null,
-            'description' => null,
-            'image_url' => null,
-            'genres' => [$updateGenre->id],
-        ];
-
-        $response = $this->actingAs($user)
-            ->put("/books/{$book->id}", $data);
-
-        $response->assertRedirect("/books/{$book->id}");
+        $response->assertRedirect("/books/{$this->book->id}");
 
         $this->assertDatabaseHas('books', [
-            'id' => $book->id,
+            'id' => $this->book->id,
             'title' => '変更後の書籍',
             'author' => '変更後の著者',
-            'user_id' => $user->id,
+            'user_id' => $this->user->id,
         ]);
 
         $this->assertDatabaseHas('book_genre', [
-            'book_id' => $book->id,
-            'genre_id' => $updateGenre->id,
+            'book_id' => $this->book->id,
+            'genre_id' => $this->genre->id,
         ]);
     }
 
-    public function test_更新対象自身の_isb_nを維持して書籍を更新できる(): void
+    public function test_更新対象自身のISBN13を維持して更新(): void
     {
-        $user = User::factory()->create();
-        $genre = Genre::factory()->create();
+        $data = $this->validBookData();
 
-        $book = Book::factory()->create([
-            'user_id' => $user->id,
-            'isbn' => '9780000000001',
-        ]);
+        $data['title'] = '更新後の書籍';
+        $data['author'] = '更新後の著者';
+        $data['isbn'] = '9780000000001';
+        $data['published_date'] = '2026-01-01';
 
-        $book->genres()->attach($genre->id);
-
-        $data = [
-            'title' => '更新後の書籍',
-            'author' => '更新後の著者',
-            'isbn' => '9780000000001',
-            'published_date' => '2026-01-01',
-            'genres' => [$genre->id],
-        ];
-
-        $response = $this->actingAs($user)
-            ->put("/books/{$book->id}", $data);
+        $response = $this->actingAs($this->user)
+            ->put("/books/{$this->book->id}", $data);
 
         $response->assertSessionDoesntHaveErrors();
-
-        $response->assertRedirect("/books/{$book->id}");
+        $response->assertRedirect("/books/{$this->book->id}");
 
         $this->assertDatabaseHas('books', [
-            'id' => $book->id,
+            'id' => $this->book->id,
             'isbn' => '9780000000001',
             'title' => '更新後の書籍',
             'published_date' => '2026-01-01',
         ]);
     }
 
-    public function test_書籍更新時のバリデーション(): void
+    public function test_必須項目を未入力で更新(): void
     {
-        $user = User::factory()->create();
+        $data = $this->validBookData();
 
-        $genre = Genre::factory()->create([
-            'name' => '小説',
+        $data['title'] = '';
+        $data['author'] = '';
+        $data['genres'] = [];
+
+        $response = $this->actingAs($this->user)
+            ->put("/books/{$this->book->id}", $data);
+
+        $response->assertSessionHasErrors([
+            'title',
+            'author',
+            'genres',
         ]);
-
-        $book = Book::factory()->create([
-            'user_id' => $user->id,
-            'title' => '変更前の書籍',
-            'author' => '変更前の著者',
-        ]);
-
-        $book->genres()->attach($genre->id);
-
-        $validData = [
-            'title' => '更新後の書籍',
-            'author' => '更新後の著者',
-            'isbn' => null,
-            'published_date' => null,
-            'description' => null,
-            'image_url' => null,
-            'genres' => [$genre->id],
-        ];
-
-        $testCases = [
-            '必須項目未入力' => [
-                'data' => [
-                    'title' => '',
-                    'author' => '',
-                    'genres' => [],
-                ],
-                'errors' => [
-                    'title',
-                    'author',
-                    'genres',
-                ],
-            ],
-
-            '文字数超過' => [
-                'data' => [
-                    'title' => str_repeat('a', 256),
-                    'author' => str_repeat('a', 256),
-                    'description' => str_repeat('a', 1001),
-                ],
-                'errors' => [
-                    'title',
-                    'author',
-                    'description',
-                ],
-            ],
-
-            'ISBN桁数不正' => [
-                'data' => [
-                    'isbn' => '123456789012',
-                ],
-                'errors' => [
-                    'isbn',
-                ],
-            ],
-
-            'ISBN数字不正' => [
-                'data' => [
-                    'isbn' => '1234567890abc',
-                ],
-                'errors' => [
-                    'isbn',
-                ],
-            ],
-
-            '他の書籍とISBN重複' => [
-                'data' => [
-                    'isbn' => '9781111111111',
-                ],
-                'errors' => [
-                    'isbn',
-                ],
-                'createBook' => true,
-            ],
-
-            '出版日不正' => [
-                'data' => [
-                    'published_date' => '2026-02-31',
-                ],
-                'errors' => [
-                    'published_date',
-                ],
-            ],
-
-            '画像URL不正' => [
-                'data' => [
-                    'image_url' => 'invalid-url',
-                ],
-                'errors' => [
-                    'image_url',
-                ],
-            ],
-        ];
-
-        foreach ($testCases as $case) {
-            $data = array_merge($validData, $case['data']);
-
-            if (! empty($case['createBook'])) {
-                Book::factory()->create([
-                    'isbn' => '9781111111111',
-                ]);
-            }
-
-            $response = $this->actingAs($user)
-                ->put("/books/{$book->id}", $data);
-
-            $response->assertSessionHasErrors($case['errors']);
-        }
     }
 
-    public function test_未ログインで書籍を更新できない(): void
+    public function test_文字数制限を超えて更新(): void
     {
-        $user = User::factory()->create();
+        $data = $this->validBookData();
 
-        $book = Book::factory()->create([
-            'user_id' => $user->id,
+        $data['title'] = str_repeat('a', 256);
+        $data['author'] = str_repeat('a', 256);
+        $data['description'] = str_repeat('a', 1001);
+
+        $response = $this->actingAs($this->user)
+            ->put("/books/{$this->book->id}", $data);
+
+        $response->assertSessionHasErrors([
+            'title',
+            'author',
+            'description',
+        ]);
+    }
+
+    public function test_ISBN13の桁数を12桁で更新(): void
+    {
+        $data = $this->validBookData();
+        $data['isbn'] = '123456789012';
+
+        $response = $this->actingAs($this->user)
+            ->put("/books/{$this->book->id}", $data);
+
+        $response->assertSessionHasErrors(['isbn']);
+    }
+
+    public function test_ISBN13の桁数を14桁で更新(): void
+    {
+        $data = $this->validBookData();
+        $data['isbn'] = '12345678901234';
+
+        $response = $this->actingAs($this->user)
+            ->put("/books/{$this->book->id}", $data);
+
+        $response->assertSessionHasErrors(['isbn']);
+    }
+
+    public function test_ISBN13を数字以外で更新(): void
+    {
+        $data = $this->validBookData();
+        $data['isbn'] = '1234567890abc';
+
+        $response = $this->actingAs($this->user)
+            ->put("/books/{$this->book->id}", $data);
+
+        $response->assertSessionHasErrors(['isbn']);
+    }
+
+    public function test_他の書籍と同じISBN13で更新(): void
+    {
+        $isbn = '9781111111111';
+
+        Book::factory()->create([
+            'isbn' => $isbn,
         ]);
 
-        $data = [
-            'title' => '更新後タイトル',
-            'author' => '更新後著者',
-            'isbn' => $book->isbn,
-            'published_date' => '2026-02-01',
-            'description' => null,
-            'image_url' => null,
-            'genres' => [],
-        ];
+        $data = $this->validBookData();
+        $data['isbn'] = $isbn;
 
-        $response = $this->put("/books/{$book->id}", $data);
+        $response = $this->actingAs($this->user)
+            ->put("/books/{$this->book->id}", $data);
+
+        $response->assertSessionHasErrors(['isbn']);
+    }
+
+    public function test_出版日に不正な値を入力して更新(): void
+    {
+        $data = $this->validBookData();
+        $data['published_date'] = '2026-02-31';
+
+        $response = $this->actingAs($this->user)
+            ->put("/books/{$this->book->id}", $data);
+
+        $response->assertSessionHasErrors(['published_date']);
+    }
+
+    public function test_画像URLに不正な値を入力して更新(): void
+    {
+        $data = $this->validBookData();
+        $data['image_url'] = 'invalid-url';
+
+        $response = $this->actingAs($this->user)
+            ->put("/books/{$this->book->id}", $data);
+
+        $response->assertSessionHasErrors(['image_url']);
+    }
+
+    public function test_未ログインで書籍を更新(): void
+    {
+        $data = $this->validBookData();
+
+        $data['title'] = '変更後の書籍';
+        $data['author'] = '変更後の著者';
+
+        $response = $this->put("/books/{$this->book->id}", $data);
 
         $response->assertRedirect('/login');
 
         $this->assertDatabaseMissing('books', [
-            'title' => '更新後タイトル',
+            'title' => '変更後の書籍',
+            'author' => '変更後の著者',
         ]);
     }
 
-    public function test_自分が登録した書籍を削除できる(): void
+    public function test_自分が登録した書籍を削除(): void
     {
-        $user = User::factory()->create();
-        $genre = Genre::factory()->create();
-        $book = Book::factory()->create([
-            'user_id' => $user->id,
-        ]);
-        $book->genres()->attach($genre->id);
-
-        $response = $this->actingAs($user)
-            ->delete("/books/{$book->id}");
+        $response = $this->actingAs($this->user)
+            ->delete("/books/{$this->book->id}");
 
         $response->assertRedirect('/');
 
         $this->assertDatabaseMissing('books', [
-            'id' => $book->id,
+            'id' => $this->book->id,
         ]);
 
         $this->assertDatabaseMissing('book_genre', [
-            'book_id' => $book->id,
-            'genre_id' => $genre->id,
+            'book_id' => $this->book->id,
+            'genre_id' => $this->genre->id,
         ]);
     }
 
-    public function test_他ユーザーが登録した書籍を削除できない(): void
+    public function test_他ユーザーが登録した書籍を削除(): void
     {
-        $userA = User::factory()->create();
-        $userB = User::factory()->create();
-        $genre = Genre::factory()->create();
-        $book = Book::factory()->create([
-            'user_id' => $userA->id,
-        ]);
-        $book->genres()->attach($genre->id);
+        $otherUser = User::factory()->create();
 
-        $response = $this->actingAs($userB)
-            ->delete("/books/{$book->id}");
+        $response = $this->actingAs($otherUser)
+            ->delete("/books/{$this->book->id}");
 
         $response->assertStatus(403);
 
         $this->assertDatabaseHas('books', [
-            'id' => $book->id,
+            'id' => $this->book->id,
         ]);
 
         $this->assertDatabaseHas('book_genre', [
-            'book_id' => $book->id,
-            'genre_id' => $genre->id,
+            'book_id' => $this->book->id,
+            'genre_id' => $this->genre->id,
         ]);
     }
 
-    public function test_存在しない書籍を削除できない(): void
+    public function test_存在しない書籍を削除(): void
     {
-        $user = User::factory()->create();
-
-        $response = $this->actingAs($user)
+        $response = $this->actingAs($this->user)
             ->delete('/books/99');
 
         $response->assertStatus(404);
@@ -463,26 +405,19 @@ class BookTest extends TestCase
         ]);
     }
 
-    public function test_未ログインで書籍を削除できない(): void
+    public function test_未ログインで書籍を削除(): void
     {
-        $user = User::factory()->create();
-        $genre = Genre::factory()->create();
-        $book = Book::factory()->create([
-            'user_id' => $user->id,
-        ]);
-        $book->genres()->attach($genre->id);
-
-        $response = $this->delete("/books/{$book->id}");
+        $response = $this->delete("/books/{$this->book->id}");
 
         $response->assertRedirect('/login');
 
         $this->assertDatabaseHas('books', [
-            'id' => $book->id,
+            'id' => $this->book->id,
         ]);
 
         $this->assertDatabaseHas('book_genre', [
-            'book_id' => $book->id,
-            'genre_id' => $genre->id,
+            'book_id' => $this->book->id,
+            'genre_id' => $this->genre->id,
         ]);
     }
 }
