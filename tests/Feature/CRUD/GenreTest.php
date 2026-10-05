@@ -12,79 +12,85 @@ class GenreTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * A basic feature test example.
-     */
-    public function test_ジャンル名を入力してジャンルを登録できる(): void
-    {
-        $user = User::factory()->create();
+    private User $user;
+    private Genre $genre;
+    private Genre $otherGenre;
 
-        $data = [
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->user = User::factory()->create();
+        $this->genre = Genre::factory()->create([
             'name' => '小説',
+        ]);
+        $this->otherGenre = Genre::factory()->create([
+            'name' => '技術書',
+        ]);
+    }
+
+    public function test_ジャンル名を入力してジャンルを登録(): void
+    {
+        $data = [
+            'name' => 'ビジネス',
         ];
 
-        $response = $this->actingAs($user)->post('/genres', $data);
+        $response = $this->actingAs($this->user)
+            ->post('/genres', $data);
 
         $response->assertRedirect('/genres');
 
         $this->assertDatabaseHas('genres', [
-            'name' => '小説',
-        ]);
-    }
-
-    public function test_ジャンル登録時のバリデーション(): void
-    {
-        $user = User::factory()->create();
-        Genre::factory()->create([
             'name' => 'ビジネス',
         ]);
-
-        $validData = [
-            'name' => '小説',
-        ];
-
-        $testCase = [
-            '必須項目未入力' => [
-                'data' => [
-                    'name' => '',
-                ],
-                'errors' => [
-                    'name',
-                ],
-            ],
-
-            '文字超過' => [
-                'data' => [
-                    'name' => str_repeat('a', 256),
-                ],
-                'errors' => [
-                    'name',
-                ],
-            ],
-
-            '登録済みジャンル登録' => [
-                'data' => [
-                    'name' => 'ビジネス',
-                ],
-                'errors' => [
-                    'name',
-                ],
-            ],
-        ];
-
-        foreach ($testCase as $case) {
-            $data = array_merge($validData, $case['data']);
-
-            $response = $this->actingAs($user)->post('/genres', $data);
-
-            $response->assertSessionHasErrors($case['errors']);
-        }
     }
 
-    public function test_未ログインでジャンルを登録できない(): void
+    public function test_ジャンル名を未入力で登録(): void
+    {
+        $data = [
+            'name' => '',
+        ];
+
+        $response = $this->actingAs($this->user)
+            ->post('/genres', $data);
+
+        $response->assertSessionHasErrors([
+            'name',
+        ]);
+    }
+
+    public function test_ジャンル名の文字数制限を超えて登録(): void
+    {
+        $data = [
+            'name' => str_repeat('a', 256),
+        ];
+
+        $response = $this->actingAs($this->user)
+            ->post('/genres', $data);
+
+        $response->assertSessionHasErrors([
+            'name',
+        ]);
+    }
+
+    public function test_登録済みのジャンル名で登録(): void
     {
         $data = [
             'name' => '小説',
+        ];
+
+        $response = $this->actingAs($this->user)
+            ->post('/genres', $data);
+
+        $response->assertSessionHasErrors([
+            'name',
+        ]);
+    }
+
+    public function test_未ログインでジャンルを登録(): void
+    {
+        $data = [
+            'name' => 'ビジネス',
         ];
 
         $response = $this->post('/genres', $data);
@@ -92,163 +98,141 @@ class GenreTest extends TestCase
         $response->assertRedirect('/login');
 
         $this->assertDatabaseMissing('genres', [
-            'name' => '小説',
+            'name' => 'ビジネス',
         ]);
     }
 
-    public function test_ジャンル名を変更して編集完了できる(): void
-    {
-        $user = User::factory()->create();
-        $genre = Genre::factory()->create([
-            'name' => '小説',
-        ]);
 
+    public function test_ジャンル名を変更して編集(): void
+    {
         $data = [
             'name' => 'ビジネス',
         ];
 
-        $response = $this->actingAs($user)->put("/genres/{$genre->id}", $data);
+        $response = $this->actingAs($this->user)
+            ->put("/genres/{$this->genre->id}", $data);
 
         $response->assertRedirect('/genres');
 
         $this->assertDatabaseHas('genres', [
-            'id' => $genre->id,
+            'id' => $this->genre->id,
             'name' => 'ビジネス',
         ]);
     }
 
-    public function test_現在のジャンル名を維持して編集完了できる(): void
+    public function test_現在のジャンル名を維持して編集(): void
     {
-        $user = User::factory()->create();
-        $genre = Genre::factory()->create([
-            'name' => '小説',
-        ]);
-
         $data = [
-            'name' => '小説',
+            'name' => $this->genre->name,
         ];
 
-        $response = $this->actingAs($user)->put("/genres/{$genre->id}", $data);
+        $response = $this->actingAs($this->user)
+            ->put("/genres/{$this->genre->id}", $data);
 
         $response->assertRedirect('/genres');
 
         $this->assertDatabaseHas('genres', [
-            'id' => $genre->id,
-            'name' => '小説',
+            'id' => $this->genre->id,
+            'name' => $this->genre->name,
         ]);
     }
 
-    public function test_ジャンル編集時のバリデーション(): void
+    public function test_ジャンル名を未入力で編集(): void
     {
-        $user = User::factory()->create();
-        $genre = Genre::factory()->create([
-            'name' => 'ビジネス',
-        ]);
-        Genre::factory()->create([
-            'name' => '技術書',
-        ]);
-
-        $validData = [
-            'name' => '小説',
+        $data = [
+            'name' => '',
         ];
 
-        $testCase = [
-            '必須項目未入力' => [
-                'data' => [
-                    'name' => '',
-                ],
-                'errors' => [
-                    'name',
-                ],
-            ],
+        $response = $this->actingAs($this->user)
+            ->put("/genres/{$this->genre->id}", $data);
 
-            '文字超過' => [
-                'data' => [
-                    'name' => str_repeat('a', 256),
-                ],
-                'errors' => [
-                    'name',
-                ],
-            ],
-
-            '登録済みジャンル名に変更' => [
-                'data' => [
-                    'name' => '技術書',
-                ],
-                'errors' => [
-                    'name',
-                ],
-            ],
-        ];
-
-        foreach ($testCase as $case) {
-            $data = array_merge($validData, $case['data']);
-
-            $response = $this->actingAs($user)->put("/genres/{$genre->id}", $data);
-
-            $response->assertSessionHasErrors($case['errors']);
-        }
+        $response->assertSessionHasErrors([
+            'name',
+        ]);
     }
 
-    public function test_未ログインでジャンルを編集できない(): void
+    public function test_ジャンル名の文字数制限を超えて編集(): void
     {
-        $genre = Genre::factory()->create([
-            'name' => '小説',
+        $data = [
+            'name' => str_repeat('a', 256),
+        ];
+
+        $response = $this->actingAs($this->user)
+            ->put("/genres/{$this->genre->id}", $data);
+
+        $response->assertSessionHasErrors([
+            'name',
         ]);
+    }
+
+    public function test_他のジャンルと重複するジャンル名で編集(): void
+    {
+        $data = [
+            'name' => $this->otherGenre->name,
+        ];
+
+        $response = $this->actingAs($this->user)
+            ->put("/genres/{$this->genre->id}", $data);
+
+        $response->assertSessionHasErrors([
+            'name',
+        ]);
+    }
+
+    public function test_未ログインでジャンルを編集(): void
+    {
         $data = [
             'name' => 'ビジネス',
         ];
 
-        $response = $this->put("/genres/{$genre->id}", $data);
+        $response = $this->put("/genres/{$this->genre->id}", $data);
 
         $response->assertRedirect('/login');
 
         $this->assertDatabaseMissing('genres', [
             'name' => 'ビジネス',
         ]);
-    }
 
-    public function test_関連書籍がないジャンルを削除できる(): void
-    {
-        $user = User::factory()->create();
-        $genre = Genre::factory()->create([
+        $this->assertDatabaseHas('genres', [
+            'id' => $this->genre->id,
             'name' => '小説',
         ]);
+    }
 
-        $response = $this->actingAs($user)->delete("/genres/{$genre->id}");
+    public function test_関連書籍がないジャンルを削除(): void
+    {
+        $response = $this->actingAs($this->user)
+            ->delete("/genres/{$this->genre->id}");
 
         $response->assertRedirect('/genres');
 
         $this->assertDatabaseMissing('genres', [
-            'id' => $genre->id,
+            'id' => $this->genre->id,
             'name' => '小説',
         ]);
     }
 
-    public function test_関連書籍があるジャンルを削除できない(): void
+    public function test_関連書籍があるジャンルを削除(): void
     {
-        $user = User::factory()->create();
         $book = Book::factory()->create();
-        $genre = Genre::factory()->create([
-            'name' => '小説',
-        ]);
-        $book->genres()->attach($genre->id);
 
-        $response = $this->actingAs($user)->delete("/genres/{$genre->id}");
+        $book->genres()->attach($this->genre->id);
+
+        $response = $this->actingAs($this->user)
+            ->delete("/genres/{$this->genre->id}");
 
         $response->assertRedirect('/genres');
 
         $this->assertDatabaseHas('genres', [
-            'id' => $genre->id,
+            'id' => $this->genre->id,
             'name' => '小説',
         ]);
     }
 
-    public function test_存在しないジャンルを削除できない(): void
+    public function test_存在しないジャンルを削除(): void
     {
-        $user = User::factory()->create();
-
-        $response = $this->actingAs($user)->delete('/genres/99');
+        $response = $this->actingAs($this->user)
+            ->delete('/genres/99');
 
         $response->assertStatus(404);
 
@@ -257,18 +241,14 @@ class GenreTest extends TestCase
         ]);
     }
 
-    public function test_未ログインでジャンルを削除できない(): void
+    public function test_未ログインでジャンルを削除(): void
     {
-        $genre = Genre::factory()->create([
-            'name' => '小説',
-        ]);
-
-        $response = $this->delete("/genres/{$genre->id}");
+        $response = $this->delete("/genres/{$this->genre->id}");
 
         $response->assertRedirect('/login');
 
         $this->assertDatabaseHas('genres', [
-            'id' => $genre->id,
+            'id' => $this->genre->id,
             'name' => '小説',
         ]);
     }
