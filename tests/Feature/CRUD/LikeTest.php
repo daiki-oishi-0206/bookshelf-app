@@ -11,36 +11,40 @@ class LikeTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * A basic feature test example.
-     */
+    private User $user;
+    private Review $review;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->user = User::factory()->create();
+        $this->review = Review::factory()->create();
+    }
+
     public function test_レビューにいいねを登録できる(): void
     {
-        $user = User::factory()->create();
-        $review = Review::factory()->create();
-        $beforeCount = $review->likes()->count();
+        $beforeCount = $this->review->likes()->count();
 
-        $response = $this->actingAs($user)
-            ->from("/books/{$review->book_id}")
-            ->post("/reviews/{$review->id}/like");
+        $response = $this->actingAs($this->user)
+            ->from("/books/{$this->review->book_id}")
+            ->post("/reviews/{$this->review->id}/like");
 
-        $afterCount = $review->likes()->count();
+        $afterCount = $this->review->likes()->count();
 
-        $response->assertRedirect("/books/{$review->book_id}");
+        $response->assertRedirect("/books/{$this->review->book_id}");
 
         $this->assertSame($beforeCount + 1, $afterCount);
 
         $this->assertDatabaseHas('review_likes', [
-            'user_id' => $user->id,
-            'review_id' => $review->id,
+            'user_id' => $this->user->id,
+            'review_id' => $this->review->id,
         ]);
     }
 
     public function test_存在しないレビューにいいねを登録できない(): void
     {
-        $user = User::factory()->create();
-
-        $response = $this->actingAs($user)
+        $response = $this->actingAs($this->user)
             ->post('/reviews/99/like');
 
         $response->assertStatus(404);
@@ -48,56 +52,48 @@ class LikeTest extends TestCase
 
     public function test_未ログインでいいねを登録できない(): void
     {
-        $review = Review::factory()->create();
-
-        $response = $this->post("/reviews/{$review->id}/like");
+        $response = $this->post("/reviews/{$this->review->id}/like");
 
         $response->assertRedirect('/login');
 
         $this->assertDatabaseMissing('review_likes', [
-            'review_id' => $review->id,
+            'review_id' => $this->review->id,
         ]);
     }
 
     public function test_レビューのいいねを解除できる(): void
     {
-        $user = User::factory()->create();
-        $review = Review::factory()->create();
+        $this->user->likedReviews()->attach($this->review->id);
 
-        $user->likedReviews()->attach($review->id);
+        $beforeCount = $this->review->likes()->count();
 
-        $beforeCount = $review->likes()->count();
+        $response = $this->actingAs($this->user)
+            ->from("/books/{$this->review->book_id}")
+            ->post("/reviews/{$this->review->id}/like");
 
-        $response = $this->actingAs($user)
-            ->from("/books/{$review->book_id}")
-            ->post("/reviews/{$review->id}/like");
+        $afterCount = $this->review->likes()->count();
 
-        $afterCount = $review->likes()->count();
-
-        $response->assertRedirect("/books/{$review->book_id}");
+        $response->assertRedirect("/books/{$this->review->book_id}");
 
         $this->assertSame($beforeCount - 1, $afterCount);
 
         $this->assertDatabaseMissing('review_likes', [
-            'user_id' => $user->id,
-            'review_id' => $review->id,
+            'user_id' => $this->user->id,
+            'review_id' => $this->review->id,
         ]);
     }
 
     public function test_未ログインでいいねを解除できない(): void
     {
-        $user = User::factory()->create();
-        $review = Review::factory()->create();
+        $this->user->likedReviews()->attach($this->review->id);
 
-        $user->likedReviews()->attach($review->id);
-
-        $response = $this->post("/reviews/{$review->id}/like");
+        $response = $this->post("/reviews/{$this->review->id}/like");
 
         $response->assertRedirect('/login');
 
         $this->assertDatabaseHas('review_likes', [
-            'user_id' => $user->id,
-            'review_id' => $review->id,
+            'user_id' => $this->user->id,
+            'review_id' => $this->review->id,
         ]);
     }
 }
