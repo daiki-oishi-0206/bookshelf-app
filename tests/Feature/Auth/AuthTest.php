@@ -10,17 +10,27 @@ class AuthTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * A basic feature test example.
-     */
-    public function test_正しい情報を入力して会員登録できる(): void
+    private function validRegistrationData(): array
     {
-        $data = [
+        return [
             'name' => 'テストユーザー',
             'email' => 'test@example.com',
             'password' => 'password',
             'password_confirmation' => 'password',
         ];
+    }
+
+    private function validLoginData(): array
+    {
+        return [
+            'email' => 'test@example.com',
+            'password' => 'password',
+        ];
+    }
+
+    public function test_正しい情報を入力して会員登録(): void
+    {
+        $data = $this->validRegistrationData();
 
         $response = $this->post('/register', $data);
 
@@ -34,103 +44,90 @@ class AuthTest extends TestCase
         ]);
     }
 
-    public function test_会員登録時のバリデーション(): void
+    public function test_必須項目を未入力で会員登録(): void
     {
-        User::factory()->create([
-            'name' => 'テストユーザーA',
-            'email' => 'valid_a@example.com',
+        $data = $this->validRegistrationData();
+
+        $data['name'] = '';
+        $data['email'] = '';
+        $data['password'] = '';
+        $data['password_confirmation'] = '';
+
+        $response = $this->post('/register', $data);
+
+        $response->assertSessionHasErrors([
+            'name',
+            'email',
+            'password',
         ]);
-
-        $validData = [
-            'name' => 'テストユーザーB',
-            'email' => 'valid_b@example.com',
-            'password' => 'password',
-            'password_confirmation' => 'password',
-        ];
-
-        $testCases = [
-            '必須項目未入力' => [
-                'data' => [
-                    'name' => '',
-                    'email' => '',
-                    'password' => '',
-                    'password_confirmation' => '',
-                ],
-                'errors' => [
-                    'name',
-                    'email',
-                    'password',
-                ],
-            ],
-
-            'メールアドレス形式不正' => [
-                'data' => [
-                    'email' => 'invalid-email',
-                ],
-                'errors' => [
-                    'email',
-                ],
-            ],
-
-            '登録済みメールアドレス' => [
-                'data' => [
-                    'email' => 'valid_a@example.com',
-                ],
-                'errors' => [
-                    'email',
-                ],
-            ],
-
-            'メールアドレス文字数超過' => [
-                'data' => [
-                    'email' => str_repeat('a', 256).'@example.com',
-                ],
-                'errors' => [
-                    'email',
-                ],
-            ],
-
-            'パスワード文字数不足' => [
-                'data' => [
-                    'password' => '1234567',
-                    'password_confirmation' => '1234567',
-                ],
-                'errors' => [
-                    'password',
-                ],
-            ],
-
-            'パスワード文字数超過' => [
-                'data' => [
-                    'password' => str_repeat('a', 256),
-                    'password_confirmation' => str_repeat('a', 256),
-                ],
-                'errors' => [
-                    'password',
-                ],
-            ],
-        ];
-
-        foreach ($testCases as $case) {
-            $data = array_merge($validData, $case['data']);
-
-            $response = $this->post('/register', $data);
-
-            $response->assertSessionHasErrors($case['errors']);
-        }
     }
 
-    public function test_正しい情報でログインできる(): void
+    public function test_メールアドレスの形式が不正な状態で登録(): void
+    {
+        $data = $this->validRegistrationData();
+
+        $data['email'] = 'invalid-email';
+
+        $response = $this->post('/register', $data);
+
+        $response->assertSessionHasErrors([
+            'email',
+        ]);
+    }
+
+    public function test_登録済みのメールアドレスで会員登録(): void
+    {
+        User::factory()->create([
+            'email' => 'test@example.com',
+        ]);
+
+        $data = $this->validRegistrationData();
+
+        $response = $this->post('/register', $data);
+
+        $response->assertSessionHasErrors([
+            'email',
+        ]);
+    }
+
+    public function test_メールアドレス・パスワードの文字数制限を超えて登録(): void
+    {
+        $data = $this->validRegistrationData();
+
+        $data['email'] = str_repeat('a', 256) . '@example.com';
+        $data['password'] = str_repeat('a', 256);
+        $data['password_confirmation'] = str_repeat('a', 256);
+
+        $response = $this->post('/register', $data);
+
+        $response->assertSessionHasErrors([
+            'email',
+            'password',
+        ]);
+    }
+
+    public function test_パスワードの文字数が不足した状態で登録(): void
+    {
+        $data = $this->validRegistrationData();
+
+        $data['password'] = '1234567';
+        $data['password_confirmation'] = '1234567';
+
+        $response = $this->post('/register', $data);
+
+        $response->assertSessionHasErrors([
+            'password',
+        ]);
+    }
+
+    public function test_正しいメールアドレスとパスワードでログイン(): void
     {
         $user = User::factory()->create([
             'email' => 'test@example.com',
             'password' => 'password',
         ]);
 
-        $data = [
-            'email' => 'test@example.com',
-            'password' => 'password',
-        ];
+        $data = $this->validLoginData();
 
         $response = $this->post('/login', $data);
 
@@ -139,82 +136,67 @@ class AuthTest extends TestCase
         $this->assertAuthenticatedAs($user);
     }
 
-    public function test_ログイン時のバリデーション(): void
+    public function test_メールアドレスとパスワードを未入力でログイン(): void
     {
-        User::factory()->create([
-            'email' => 'valid_a@example.com',
-            'password' => 'password',
+        $data = $this->validLoginData();
+
+        $data['email'] = '';
+        $data['password'] = '';
+
+        $response = $this->post('/login', $data);
+
+        $response->assertSessionHasErrors([
+            'email',
+            'password',
         ]);
-
-        $validData = [
-            'email' => 'valid_a@example.com',
-            'password' => 'password',
-        ];
-
-        $testCases = [
-            '必須項目未入力' => [
-                'data' => [
-                    'email' => '',
-                    'password' => '',
-                ],
-                'errors' => [
-                    'email',
-                    'password',
-                ],
-            ],
-
-            'メールアドレス形式不正' => [
-                'data' => [
-                    'email' => 'invalid-email',
-                ],
-                'errors' => [
-                    'email',
-                ],
-            ],
-
-            'メールアドレス文字数超過' => [
-                'data' => [
-                    'email' => str_repeat('a', 256).'@example.com',
-                ],
-                'errors' => [
-                    'email',
-                ],
-            ],
-
-            'パスワード文字数不足' => [
-                'data' => [
-                    'password' => '1234567',
-                ],
-                'errors' => [
-                    'password',
-                ],
-            ],
-
-            'パスワード文字数超過' => [
-                'data' => [
-                    'password' => str_repeat('a', 256),
-                ],
-                'errors' => [
-                    'password',
-                ],
-            ],
-        ];
-
-        foreach ($testCases as $case) {
-            $data = array_merge($validData, $case['data']);
-
-            $response = $this->post('/login', $data);
-
-            $response->assertSessionHasErrors($case['errors']);
-        }
     }
 
-    public function test_存在しないメールアドレスではログインできない(): void
+    public function test_メールアドレスの形式が不正な状態でログイン(): void
     {
-        $data = [
-            'email' => 'notfound@example.com',
-            'password' => 'password',
-        ];
+        $data = $this->validLoginData();
+
+        $data['email'] = 'invalid-email';
+
+        $response = $this->post('/login', $data);
+
+        $response->assertSessionHasErrors([
+            'email',
+        ]);
+    }
+
+    public function test_メールアドレス・パスワードの文字数制限を超えてログイン(): void
+    {
+        $data = $this->validLoginData();
+
+        $data['email'] = str_repeat('a', 256) . '@example.com';
+        $data['password'] = str_repeat('a', 256);
+
+        $response = $this->post('/login', $data);
+
+        $response->assertSessionHasErrors([
+            'email',
+            'password',
+        ]);
+    }
+
+    public function test_パスワードの文字数が不足した状態でログイン(): void
+    {
+        $data = $this->validLoginData();
+
+        $data['password'] = '1234567';
+
+        $response = $this->post('/login', $data);
+
+        $response->assertSessionHasErrors([
+            'password',
+        ]);
+    }
+
+    public function test_存在しないメールアドレスでログイン(): void
+    {
+        $data = $this->validLoginData();
+
+        $data['email'] = 'notfound@example.com';
 
         $response = $this->post('/login', $data);
 
@@ -225,17 +207,16 @@ class AuthTest extends TestCase
         $this->assertGuest();
     }
 
-    public function test_パスワードが間違っている場合はログインできない(): void
+    public function test_パスワードが間違っている状態でログイン(): void
     {
         User::factory()->create([
-            'email' => 'valid@example.com',
+            'email' => 'test@example.com',
             'password' => 'password',
         ]);
 
-        $data = [
-            'email' => 'valid@example.com',
-            'password' => 'wrong-password',
-        ];
+        $data = $this->validLoginData();
+
+        $data['password'] = 'wrong-password';
 
         $response = $this->post('/login', $data);
 
@@ -246,14 +227,15 @@ class AuthTest extends TestCase
         $this->assertGuest();
     }
 
-    public function test_ログアウトできる(): void
+    public function test_ログイン状態でログアウト(): void
     {
         $user = User::factory()->create([
             'email' => 'test@example.com',
             'password' => 'password',
         ]);
 
-        $response = $this->actingAs($user)->post('/logout');
+        $response = $this->actingAs($user)
+            ->post('/logout');
 
         $response->assertRedirect('/login');
 
