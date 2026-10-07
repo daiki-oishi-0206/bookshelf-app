@@ -82,7 +82,7 @@ class BookApiTest extends TestCase
         $book->genres()->attach($this->genre->id);
 
         $otherGenre = Genre::factory()->create([
-            'name' => '技術書',
+            'name' => '他のジャンル',
         ]);
 
         $otherBook = Book::factory()->create();
