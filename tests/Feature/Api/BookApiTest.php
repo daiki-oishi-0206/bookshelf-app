@@ -81,7 +81,9 @@ class BookApiTest extends TestCase
         $book = Book::factory()->create();
         $book->genres()->attach($this->genre->id);
 
-        $otherGenre = Genre::factory()->create();
+        $otherGenre = Genre::factory()->create([
+            'name' => '技術書',
+        ]);
 
         $otherBook = Book::factory()->create();
         $otherBook->genres()->attach($otherGenre->id);
@@ -351,7 +353,9 @@ class BookApiTest extends TestCase
 
         $book->genres()->attach($this->genre->id);
 
-        $newGenre = Genre::factory()->create();
+        $newGenre = Genre::factory()->create([
+            'name' => '新しいジャンル',
+        ]);
 
         $data = $this->validBookData($newGenre->id);
 

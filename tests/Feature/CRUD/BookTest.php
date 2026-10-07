@@ -396,12 +396,12 @@ class BookTest extends TestCase
     public function test_存在しない書籍を削除(): void
     {
         $response = $this->actingAs($this->user)
-            ->delete('/books/99');
+            ->delete('/books/999999');
 
         $response->assertStatus(404);
 
         $this->assertDatabaseMissing('books', [
-            'id' => 99,
+            'id' => 999999,
         ]);
     }
 

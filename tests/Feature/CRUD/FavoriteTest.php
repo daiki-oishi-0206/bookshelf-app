@@ -59,7 +59,7 @@ class FavoriteTest extends TestCase
     public function test_存在しない書籍をお気に入り登録できない(): void
     {
         $response = $this->actingAs($this->user)
-            ->post('/books/99/favorite');
+            ->post('/books/999999/favorite');
 
         $response->assertStatus(404);
     }

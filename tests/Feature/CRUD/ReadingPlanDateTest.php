@@ -75,7 +75,7 @@ class ReadingPlanDateTest extends TestCase
         $response->assertStatus(302);
 
         $response->assertSessionHasErrors([
-            'target_date' => '期日は今日以降の日付を入力してください',
+            'target_date' => '期日は今日以降の日付を指定してください',
         ]);
     }
 

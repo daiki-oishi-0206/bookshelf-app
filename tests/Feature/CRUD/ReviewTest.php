@@ -362,12 +362,12 @@ class ReviewTest extends TestCase
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)
-            ->delete('/reviews/99');
+            ->delete('/reviews/999999');
 
         $response->assertStatus(404);
 
         $this->assertDatabaseMissing('reviews', [
-            'id' => 99,
+            'id' => 999999,
         ]);
     }
 

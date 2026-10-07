@@ -232,12 +232,12 @@ class GenreTest extends TestCase
     public function test_存在しないジャンルを削除(): void
     {
         $response = $this->actingAs($this->user)
-            ->delete('/genres/99');
+            ->delete('/genres/999999');
 
         $response->assertStatus(404);
 
         $this->assertDatabaseMissing('genres', [
-            'id' => 99,
+            'id' => 999999,
         ]);
     }
 
