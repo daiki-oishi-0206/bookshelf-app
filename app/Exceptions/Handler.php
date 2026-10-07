@@ -39,12 +39,6 @@ class Handler extends ExceptionHandler
             ], 404);
         }
 
-        if ($request->is('api/*') && $e instanceof AuthenticationException) {
-            return response()->json([
-                'error' => '認証が必要です',
-            ], 401);
-        }
-
         if ($request->is('api/*') && $e instanceof AuthorizationException) {
             return response()->json([
                 'error' => 'この操作を実行する権限がありません',
