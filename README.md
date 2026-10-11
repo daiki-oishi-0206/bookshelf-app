@@ -108,8 +108,10 @@ npmパッケージをインストールします。
 マイグレーションとシーダーを実行し、テーブルと初期データを作成します。
 
 ```bash
-./vendor/bin/sail artisan migrate --seed
+./vendor/bin/sail artisan migrate:fresh --seed
 ```
+
+※既存のテーブルとデータは削除されます。
 
 ### 7. アプリケーションの起動
 
@@ -166,20 +168,28 @@ Laravel Sanctumを使用してAPI認証を行っています。
    ```bash
    crontab -e
    ```
+   i キーで編集モードにします。
 
  　開いたファイルの末尾に、次の設定を追加します。
 
+   ※PATH と DOCKER_CONTEXT は環境によって異なる場合があります。
+   cronが正常に動作しない場合は、ご自身の環境に合わせて設定してください。
+   
    ```cron
-   * * * * * cd /プロジェクトの絶対パス/bookshelf-app && ./vendor/bin/sail artisan schedule:run >> /tmp/bookshelf-scheduler.log 2>&1
+   PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+   DOCKER_CONTEXT=desktop-linux
+   * * * * * cd /プロジェクトのパス && ./vendor/bin/sail artisan schedule:run >> /tmp/bookshelf-scheduler.log 2>&1
    ```
 
-   /プロジェクトの絶対パス は、プロジェクトのディレクトリに移動して、次のコマンドで確認してください。
+   /プロジェクトの絶対パスは、プロジェクトのディレクトリに移動して、次のコマンドで確認してください。
 
    ```bash
 　　pwd
    ```
 
 　　例えば、/Users/ユーザー名/bookshelf-app と表示された場合は、そのパスに置き換えます。
+
+   Escキーを押し、:wqと入力して、Enterキーで保存して終了してください。
 
 4. 設定を確認します。
 
