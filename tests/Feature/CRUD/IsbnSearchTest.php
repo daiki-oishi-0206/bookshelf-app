@@ -2,19 +2,20 @@
 
 namespace Tests\Feature\CRUD;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 use App\Models\User;
-use Illuminate\Support\Facades\Http;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Support\Facades\Http;
+use Tests\TestCase;
 
 class IsbnSearchTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * A basic feature test example.
      */
-    public function test_ISBNから書籍情報を取得する(): void
+    public function test_isb_nから書籍情報を取得する(): void
     {
         $user = User::factory()->create();
 
@@ -38,7 +39,7 @@ class IsbnSearchTest extends TestCase
             ], 200),
         ]);
 
-        $response = $this->actingAs($user)->get("/books/isbn/9784101010014");
+        $response = $this->actingAs($user)->get('/books/isbn/9784101010014');
 
         $response->assertStatus(200);
 
@@ -52,7 +53,7 @@ class IsbnSearchTest extends TestCase
 
     }
 
-    public function test_存在しないISBNで検索する(): void
+    public function test_存在しない_isb_nで検索する(): void
     {
         $user = User::factory()->create();
 
@@ -64,13 +65,13 @@ class IsbnSearchTest extends TestCase
 
         ]);
 
-        $response = $this->actingAs($user)->get("/books/isbn/9784101010099");
+        $response = $this->actingAs($user)->get('/books/isbn/9784101010099');
 
         $response->assertStatus(404);
 
     }
 
-    public function test_ISBN検索時にAPIからエラーレスポンスが返る(): void
+    public function test_isb_n検索時に_ap_iからエラーレスポンスが返る(): void
     {
         $user = User::factory()->create();
 
@@ -79,7 +80,7 @@ class IsbnSearchTest extends TestCase
 
         ]);
 
-        $response = $this->actingAs($user)->get("/books/isbn/9784101010014");
+        $response = $this->actingAs($user)->get('/books/isbn/9784101010014');
 
         $response->assertStatus(500);
 
@@ -89,7 +90,7 @@ class IsbnSearchTest extends TestCase
 
     }
 
-    public function test_ISBN検索時にAPIへ接続できない(): void
+    public function test_isb_n検索時に_ap_iへ接続できない(): void
     {
         $user = User::factory()->create();
 
@@ -99,7 +100,7 @@ class IsbnSearchTest extends TestCase
             },
         ]);
 
-        $response = $this->actingAs($user)->get("/books/isbn/9784101010014");
+        $response = $this->actingAs($user)->get('/books/isbn/9784101010014');
 
         $response->assertStatus(500);
 
@@ -108,6 +109,4 @@ class IsbnSearchTest extends TestCase
         ]);
 
     }
-
 }
-

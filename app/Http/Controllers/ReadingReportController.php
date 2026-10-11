@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class ReadingReportController extends Controller
 {
+    /**
+     * ユーザーの読書記録を集計し、読書レポート画面を表示する。
+     */
     public function index(): View
     {
         $user = auth()->user();
@@ -51,8 +53,8 @@ class ReadingReportController extends Controller
                     });
                 })
                 ->groupBy('id')
-                ->map(function ($genreReviews){
-                    return[
+                ->map(function ($genreReviews) {
+                    return [
                         'id' => $genreReviews->first()['id'],
                         'name' => $genreReviews->first()['name'],
                         'count' => $genreReviews->count(),
@@ -61,10 +63,9 @@ class ReadingReportController extends Controller
                 })
                 ->sortByDesc('average_rating')
                 ->take(5)
-                ->values()
+                ->values(),
         ];
 
         return view('reports.index', compact('stats'));
     }
 }
-

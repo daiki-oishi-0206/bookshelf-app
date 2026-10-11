@@ -3,16 +3,16 @@
 namespace Tests\Feature\Access;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class RankingTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * A basic feature test example.
      */
-    public function test_未ログインでランキング画面にアクセスできる(): void
+    public function test_未ログインでランキング画面にアクセス(): void
     {
         $response = $this->get('/ranking');
 

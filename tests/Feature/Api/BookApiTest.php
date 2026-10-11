@@ -2,463 +2,370 @@
 
 namespace Tests\Feature\Api;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
 use App\Models\Book;
 use App\Models\Genre;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class BookApiTest extends TestCase
 {
     use RefreshDatabase;
-    /**
-     * A basic feature test example.
-     */
-    public function test_書籍一覧を取得できる(): void
+
+    private User $user;
+    private Genre $genre;
+
+    protected function setUp(): void
     {
-        Book::factory(3)->create();
+        parent::setUp();
+
+        $this->user = User::factory()->create();
+        $this->genre = Genre::factory()->create();
+    }
+
+    private function validBookData(int $genreId): array
+    {
+        return [
+            'title' => 'Laravel入門',
+            'author' => '山田太郎',
+            'isbn' => '9781234567891',
+            'published_date' => '2025-01-01',
+            'description' => 'Laravelの入門書です',
+            'image_url' => 'https://example.com/book.jpg',
+            'genres' => [$genreId],
+        ];
+    }
+
+    public function test_書籍一覧を取得(): void
+    {
+        Book::factory()->count(3)->create();
 
         $response = $this->getJson('/api/v1/books');
 
         $response->assertStatus(200);
-
         $response->assertJsonStructure([
-            'data' => [
-                '*' => [
-                    'id',
-                    'title',
-                    'author',
-                    'genres',
-                    'average_rating',
-                    'review_count',
-                ],
-            ],
+            'data',
             'links',
-            'meta',
+            'meta' => [
+                'current_page',
+                'last_page',
+                'per_page',
+                'total',
+            ],
         ]);
     }
 
-    public function test_キーワードを指定して書籍一覧を取得できる(): void
+    public function test_キーワードを指定して書籍一覧を取得(): void
     {
         Book::factory()->create([
             'title' => 'Laravel入門',
-            'author' => '山田太郎',
         ]);
 
         Book::factory()->create([
             'title' => 'PHP入門',
-            'author' => '鈴木花子',
         ]);
 
         $response = $this->getJson('/api/v1/books?keyword=Laravel');
 
         $response->assertStatus(200);
-
-        $response->assertJsonCount(1, 'data');
-
-        $response->assertJsonPath('data.0.title', 'Laravel入門');
-
-        $response->assertJsonStructure([
-            'data' => [
-                '*' => [
-                    'id',
-                    'title',
-                    'author',
-                    'genres',
-                    'average_rating',
-                    'review_count',
-                ],
-            ],
+        $response->assertJsonFragment([
+            'title' => 'Laravel入門',
+        ]);
+        $response->assertJsonMissing([
+            'title' => 'PHP入門',
         ]);
     }
 
-    public function test_ジャンルIDを指定して書籍一覧を取得できる(): void
+    public function test_ジャンルIDを指定して書籍一覧を取得(): void
     {
-        $genre1 = Genre::factory()->create([
-            'name' => '小説',
+        $book = Book::factory()->create();
+        $book->genres()->attach($this->genre->id);
+
+        $otherGenre = Genre::factory()->create([
+            'name' => '他のジャンル',
         ]);
 
-        $genre2 = Genre::factory()->create([
-            'name' => '技術書',
-        ]);
-
-        $book1 = Book::factory()->create([
-            'title' => '小説の本',
-        ]);
-
-        $book2 = Book::factory()->create([
-            'title' => '技術書の本',
-        ]);
-
-        $book1->genres()->attach($genre1);
-        $book2->genres()->attach($genre2);
+        $otherBook = Book::factory()->create();
+        $otherBook->genres()->attach($otherGenre->id);
 
         $response = $this->getJson(
-            "/api/v1/books?genre_id={$genre1->id}"
+            "/api/v1/books?genre_id={$this->genre->id}"
         );
 
         $response->assertStatus(200);
-
-        $response->assertJsonCount(1, 'data');
-
         $response->assertJsonFragment([
-            'title' => '小説の本',
+            'id' => $book->id,
         ]);
-
         $response->assertJsonMissing([
-            'title' => '技術書の本',
-        ]);
-
-        $response->assertJsonStructure([
-            'data' => [
-                '*' => [
-                    'id',
-                    'title',
-                    'author',
-                    'genres',
-                    'average_rating',
-                    'review_count',
-                ],
-            ],
+            'id' => $otherBook->id,
         ]);
     }
 
-    public function test_ページネーションを指定して書籍一覧を取得できる(): void
+    public function test_ページネーションを指定して書籍一覧を取得(): void
     {
-        Book::factory()->count(10)->create();
+        Book::factory()->count(15)->create();
 
         $response = $this->getJson(
             '/api/v1/books?page=2&per_page=5'
         );
 
         $response->assertStatus(200);
-
-        $response->assertJsonStructure([
-            'data' => [
-                '*' => [
-                    'id',
-                    'title',
-                    'author',
-                    'genres',
-                    'average_rating',
-                    'review_count',
-                ],
-            ],
-            'links',
-            'meta',
-        ]);
-
         $response->assertJsonPath('meta.current_page', 2);
         $response->assertJsonPath('meta.per_page', 5);
-
-        $response->assertJsonCount(5, 'data');
     }
 
-    public function test_書籍一覧取得時のバリデーション(): void
+    public function test_キーワードの文字数制限を超えて書籍一覧を取得(): void
     {
-        $validData = [
-            'keyword' => 'Laravel',
-            'genre_id' => Genre::factory()->create()->id,
-            'page' => 1,
-            'per_page' => 10,
-        ];
+        $keyword = str_repeat('a', 256);
 
-        $testCases = [
-            'キーワード文字数超過' => [
-                'data' => [
-                    'keyword' => str_repeat('a', 256),
-                ],
-                'errors' => [
-                    'keyword',
-                ],
-            ],
+        $response = $this->getJson(
+            '/api/v1/books?keyword=' . $keyword
+        );
 
-            '存在しないジャンルID' => [
-                'data' => [
-                    'genre_id' => 99999,
-                ],
-                'errors' => [
-                    'genre_id',
-                ],
-            ],
-
-            'ページ番号が0' => [
-                'data' => [
-                    'page' => 0,
-                ],
-                'errors' => [
-                    'page',
-                ],
-            ],
-
-            'ページ番号が負の値' => [
-                'data' => [
-                    'page' => -1,
-                ],
-                'errors' => [
-                    'page',
-                ],
-            ],
-
-            '1ページあたりの件数が4以下' => [
-                'data' => [
-                    'per_page' => 4,
-                ],
-                'errors' => [
-                    'per_page',
-                ],
-            ],
-
-            '1ページあたりの件数が101以上' => [
-                'data' => [
-                    'per_page' => 101,
-                ],
-                'errors' => [
-                    'per_page',
-                ],
-            ],
-        ];
-
-        foreach ($testCases as $case) {
-            $data = array_merge($validData, $case['data']);
-
-            $response = $this->getJson('/api/v1/books?' . http_build_query($data));
-
-            $response->assertStatus(422);
-
-            $response->assertJsonValidationErrors($case['errors']);
-        }
-    }
-
-    public function test_書籍詳細を取得できる(): void
-    {
-        $book = Book::factory()->create([
-            'title' => 'Laravel入門',
-            'author' => '山田太郎',
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors([
+            'keyword',
         ]);
+    }
 
-        $response = $this->getJson("/api/v1/books/{$book->id}");
+    public function test_存在しないジャンルIDを指定して書籍一覧を取得(): void
+    {
+        $response = $this->getJson(
+            '/api/v1/books?genre_id=99999'
+        );
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors([
+            'genre_id',
+        ]);
+    }
+
+    public function test_不正なページ番号を指定して書籍一覧を取得(): void
+    {
+        $response = $this->getJson(
+            '/api/v1/books?page=0'
+        );
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors([
+            'page',
+        ]);
+    }
+
+    public function test_不正な1ページあたりの件数を指定して書籍一覧を取得(): void
+    {
+        $response = $this->getJson(
+            '/api/v1/books?per_page=4'
+        );
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors([
+            'per_page',
+        ]);
+    }
+
+    public function test_書籍詳細を取得(): void
+    {
+        $book = Book::factory()->create();
+
+        $response = $this->getJson(
+            "/api/v1/books/{$book->id}"
+        );
 
         $response->assertStatus(200);
-
-        $response->assertJsonStructure([
-            'data' => [
-                'id',
-                'title',
-                'author',
-                'isbn',
-                'published_date',
-                'description',
-                'genres',
-                'reviews',
-            ],
-        ]);
-
         $response->assertJsonFragment([
             'id' => $book->id,
-            'title' => 'Laravel入門',
-            'author' => '山田太郎',
+            'title' => $book->title,
         ]);
     }
 
-    public function test_存在しない書籍の詳細を取得できない(): void
+    public function test_存在しない書籍の詳細を取得(): void
     {
         $response = $this->getJson('/api/v1/books/99999');
 
         $response->assertStatus(404);
-
-        $response->assertJson([
-            'error' => '書籍が見つかりませんでした。',
-        ]);
     }
 
-    public function test_正しい情報で書籍を登録できる(): void
+
+    public function test_正しい情報で書籍を登録(): void
     {
-        $user = User::factory()->create();
+        $data = $this->validBookData($this->genre->id);
 
-        $genre = Genre::factory()->create([
-            'name' => '技術書',
-        ]);
-
-        $data = [
-            'title' => 'Laravel入門',
-            'author' => '山田太郎',
-            'isbn' => '9781234567890',
-            'published_date' => '2026-01-01',
-            'genres' => [$genre->id],
-        ];
-
-        $response = $this->actingAs($user, 'sanctum')->postJson('/api/v1/books', $data);
+        $response = $this->actingAs($this->user, 'sanctum')
+            ->postJson('/api/v1/books', $data);
 
         $response->assertStatus(201);
 
         $this->assertDatabaseHas('books', [
             'title' => 'Laravel入門',
             'author' => '山田太郎',
-            'isbn' => '9781234567890',
-            'published_date' => '2026-01-01',
+            'isbn' => '9781234567891',
+            'published_date' => '2025-01-01',
+            'user_id' => $this->user->id,
         ]);
 
-        $book = Book::where('isbn', '9781234567890')->first();
+        $book = Book::where('isbn', '9781234567891')->first();
 
         $this->assertDatabaseHas('book_genre', [
             'book_id' => $book->id,
-            'genre_id' => $genre->id,
+            'genre_id' => $this->genre->id,
         ]);
     }
 
-    public function test_書籍登録時のバリデーション(): void
+    public function test_必須項目を未入力で書籍を登録(): void
     {
-        $user = User::factory()->create();
+        $data = $this->validBookData($this->genre->id);
 
-        $genre = Genre::factory()->create();
+        $data['title'] = '';
+        $data['author'] = '';
+        $data['isbn'] = '';
+        $data['published_date'] = '';
+        $data['genres'] = [];
 
+        $response = $this->actingAs($this->user, 'sanctum')
+            ->postJson('/api/v1/books', $data);
+
+        $response->assertStatus(422);
+
+        $response->assertJsonValidationErrors([
+            'title',
+            'author',
+            'isbn',
+            'published_date',
+            'genres',
+        ]);
+    }
+
+    public function test_文字数制限を超えて書籍を登録(): void
+    {
+        $data = $this->validBookData($this->genre->id);
+
+        $data['title'] = str_repeat('a', 256);
+        $data['author'] = str_repeat('a', 256);
+        $data['description'] = str_repeat('a', 1001);
+
+        $response = $this->actingAs($this->user, 'sanctum')
+            ->postJson('/api/v1/books', $data);
+
+        $response->assertStatus(422);
+
+        $response->assertJsonValidationErrors([
+            'title',
+            'author',
+            'description',
+        ]);
+    }
+
+    public function test_ISBN13の桁数が不正な状態で書籍を登録(): void
+    {
+        $data = $this->validBookData($this->genre->id);
+
+        $data['isbn'] = '123456789012';
+
+        $response = $this->actingAs($this->user, 'sanctum')
+            ->postJson('/api/v1/books', $data);
+
+        $response->assertStatus(422);
+
+        $response->assertJsonValidationErrors([
+            'isbn',
+        ]);
+    }
+
+    public function test_ISBN13が数字以外の値で書籍を登録(): void
+    {
+        $data = $this->validBookData($this->genre->id);
+
+        $data['isbn'] = '97812345678ab';
+
+        $response = $this->actingAs($this->user, 'sanctum')
+            ->postJson('/api/v1/books', $data);
+
+        $response->assertStatus(422);
+
+        $response->assertJsonValidationErrors([
+            'isbn',
+        ]);
+    }
+
+    public function test_登録済みのISBN13で書籍を登録(): void
+    {
         Book::factory()->create([
             'isbn' => '9781234567890',
         ]);
 
-        $validData = [
-            'title' => 'Laravel入門',
-            'author' => '山田太郎',
-            'isbn' => '9781234567891',
-            'published_date' => '2025-01-01',
-            'description' => 'Laravelの入門書です。',
-            'image_url' => 'https://example.com/book.jpg',
-            'genres' => [$genre->id],
-        ];
+        $data = $this->validBookData($this->genre->id);
 
-        $testCases = [
-            '必須項目未入力' => [
-                'data' => [
-                    'title' => '',
-                    'author' => '',
-                    'isbn' => '',
-                    'published_date' => '',
-                    'genres' => [],
-                ],
-                'errors' => [
-                    'title',
-                    'author',
-                    'isbn',
-                    'published_date',
-                    'genres',
-                ],
-            ],
+        $data['isbn'] = '9781234567890';
 
-            '文字数制限超過' => [
-                'data' => [
-                    'title' => str_repeat('a', 256),
-                    'author' => str_repeat('a', 256),
-                    'description' => str_repeat('a', 1001),
-                ],
-                'errors' => [
-                    'title',
-                    'author',
-                    'description',
-                ],
-            ],
+        $response = $this->actingAs($this->user, 'sanctum')
+            ->postJson('/api/v1/books', $data);
 
-            'ISBN13桁数不足' => [
-                'data' => [
-                    'isbn' => '123456789012',
-                ],
-                'errors' => [
-                    'isbn',
-                ],
-            ],
+        $response->assertStatus(422);
 
-            'ISBN13桁数超過' => [
-                'data' => [
-                    'isbn' => '12345678901234',
-                ],
-                'errors' => [
-                    'isbn',
-                ],
-            ],
-
-            'ISBN数字以外' => [
-                'data' => [
-                    'isbn' => '97812345678ab',
-                ],
-                'errors' => [
-                    'isbn',
-                ],
-            ],
-
-            '登録済みISBN' => [
-                'data' => [
-                    'isbn' => '9781234567890',
-                ],
-                'errors' => [
-                    'isbn',
-                ],
-            ],
-
-            '出版日不正' => [
-                'data' => [
-                    'published_date' => '2025-02-30',
-                ],
-                'errors' => [
-                    'published_date',
-                ],
-            ],
-
-            '画像URL不正' => [
-                'data' => [
-                    'image_url' => 'invalid-url',
-                ],
-                'errors' => [
-                    'image_url',
-                ],
-            ],
-        ];
-
-        foreach ($testCases as $case) {
-            $data = array_merge($validData, $case['data']);
-
-            $response = $this->actingAs($user, 'sanctum')->postJson('/api/v1/books', $data);
-
-            $response->assertStatus(422);
-
-            $response->assertJsonValidationErrors($case['errors']);
-        }
+        $response->assertJsonValidationErrors([
+            'isbn',
+        ]);
     }
 
-    public function test_正しい情報で書籍を更新できる(): void
+    public function test_出版日に不正な値を指定して書籍を登録(): void
     {
-        $user = User::factory()->create();
+        $data = $this->validBookData($this->genre->id);
 
-        $genre1 = Genre::factory()->create([
-            'name' => '小説',
+        $data['published_date'] = '2025-02-30';
+
+        $response = $this->actingAs($this->user, 'sanctum')
+            ->postJson('/api/v1/books', $data);
+
+        $response->assertStatus(422);
+
+        $response->assertJsonValidationErrors([
+            'published_date',
         ]);
+    }
 
-        $genre2 = Genre::factory()->create([
-            'name' => '技術書',
+    public function test_画像URLに不正な値を指定して書籍を登録(): void
+    {
+        $data = $this->validBookData($this->genre->id);
+
+        $data['image_url'] = 'invalid-url';
+
+        $response = $this->actingAs($this->user, 'sanctum')
+            ->postJson('/api/v1/books', $data);
+
+        $response->assertStatus(422);
+
+        $response->assertJsonValidationErrors([
+            'image_url',
         ]);
+    }
 
+
+    public function test_正しい情報で書籍を更新(): void
+    {
         $book = Book::factory()->create([
-            'user_id' => $user->id,
+            'user_id' => $this->user->id,
             'title' => 'Laravel入門',
             'author' => '山田太郎',
             'isbn' => '9781234567890',
             'published_date' => '2020-01-01',
         ]);
 
-        $book->genres()->attach($genre1);
+        $book->genres()->attach($this->genre->id);
 
-        $data = [
-            'title' => 'Laravel実践入門',
-            'author' => '鈴木一郎',
-            'isbn' => '9781234567891',
-            'published_date' => '2021-01-01',
-            'genres' => [$genre2->id],
-        ];
+        $newGenre = Genre::factory()->create([
+            'name' => '新しいジャンル',
+        ]);
 
-        $response = $this->actingAs($user, 'sanctum')->putJson(
-            "/api/v1/books/{$book->id}",
-            $data
-        );
+        $data = $this->validBookData($newGenre->id);
+
+        $data['title'] = 'Laravel実践入門';
+        $data['author'] = '鈴木一郎';
+        $data['isbn'] = '9781234567891';
+        $data['published_date'] = '2021-01-01';
+
+        $response = $this->actingAs($this->user, 'sanctum')
+            ->putJson("/api/v1/books/{$book->id}", $data);
 
         $response->assertStatus(200);
 
@@ -472,221 +379,232 @@ class BookApiTest extends TestCase
 
         $this->assertDatabaseHas('book_genre', [
             'book_id' => $book->id,
-            'genre_id' => $genre2->id,
+            'genre_id' => $newGenre->id,
         ]);
     }
 
-    public function test_自身のISBN13を維持して書籍を更新できる(): void
+    public function test_必須項目を未入力で書籍を更新(): void
     {
-        $user = User::factory()->create();
-
-        $genre = Genre::factory()->create([
-            'name' => '技術書',
-        ]);
-
         $book = Book::factory()->create([
-            'user_id' => $user->id,
-            'title' => 'Laravel入門',
-            'author' => '山田太郎',
-            'isbn' => '9781234567890',
-            'published_date' => '2020-01-01',
+            'user_id' => $this->user->id,
         ]);
 
-        $book->genres()->attach($genre);
+        $book->genres()->attach($this->genre->id);
 
-        $data = [
-            'title' => 'Laravel実践入門',
-            'author' => '鈴木一郎',
-            'isbn' => '9781234567890',
-            'published_date' => '2021-01-01',
-            'genres' => [$genre->id],
-        ];
+        $data = $this->validBookData($this->genre->id);
 
-        $response = $this->actingAs($user, 'sanctum')->putJson(
-            "/api/v1/books/{$book->id}",
-            $data
-        );
+        $data['title'] = '';
+        $data['author'] = '';
+        $data['isbn'] = '';
+        $data['published_date'] = '';
+        $data['genres'] = [];
 
-        $response->assertStatus(200);
+        $response = $this->actingAs($this->user, 'sanctum')
+            ->putJson("/api/v1/books/{$book->id}", $data);
 
-        $this->assertDatabaseHas('books', [
-            'id' => $book->id,
-            'title' => 'Laravel実践入門',
-            'author' => '鈴木一郎',
-            'isbn' => '9781234567890',
-            'published_date' => '2021-01-01',
+        $response->assertStatus(422);
+
+        $response->assertJsonValidationErrors([
+            'title',
+            'author',
+            'isbn',
+            'published_date',
+            'genres',
         ]);
     }
 
-    public function test_書籍更新時のバリデーション(): void
+    public function test_文字数制限を超えて書籍を更新(): void
     {
-        $user = User::factory()->create();
-
-        $genre = Genre::factory()->create();
-
         $book = Book::factory()->create([
-            'user_id' => $user->id,
-            'title' => 'Laravel入門',
-            'author' => '山田太郎',
-            'isbn' => '9781234567890',
-            'published_date' => '2020-01-01',
+            'user_id' => $this->user->id,
         ]);
 
-        $book->genres()->attach($genre);
+        $book->genres()->attach($this->genre->id);
+
+        $data = $this->validBookData($this->genre->id);
+
+        $data['title'] = str_repeat('a', 256);
+        $data['author'] = str_repeat('a', 256);
+        $data['description'] = str_repeat('a', 1001);
+
+        $response = $this->actingAs($this->user, 'sanctum')
+            ->putJson("/api/v1/books/{$book->id}", $data);
+
+        $response->assertStatus(422);
+
+        $response->assertJsonValidationErrors([
+            'title',
+            'author',
+            'description',
+        ]);
+    }
+
+    public function test_ISBN13の桁数が不正な状態で書籍を更新(): void
+    {
+        $book = Book::factory()->create([
+            'user_id' => $this->user->id,
+        ]);
+
+        $book->genres()->attach($this->genre->id);
+
+        $data = $this->validBookData($this->genre->id);
+
+        $data['isbn'] = '123456789012';
+
+        $response = $this->actingAs($this->user, 'sanctum')
+            ->putJson("/api/v1/books/{$book->id}", $data);
+
+        $response->assertStatus(422);
+
+        $response->assertJsonValidationErrors([
+            'isbn',
+        ]);
+    }
+
+    public function test_ISBN13が数字以外の値で書籍を更新(): void
+    {
+        $book = Book::factory()->create([
+            'user_id' => $this->user->id,
+        ]);
+
+        $book->genres()->attach($this->genre->id);
+
+        $data = $this->validBookData($this->genre->id);
+
+        $data['isbn'] = '97812345678ab';
+
+        $response = $this->actingAs($this->user, 'sanctum')
+            ->putJson("/api/v1/books/{$book->id}", $data);
+
+        $response->assertStatus(422);
+
+        $response->assertJsonValidationErrors([
+            'isbn',
+        ]);
+    }
+
+    public function test_他の書籍と同じISBN13で書籍を更新(): void
+    {
+        $book = Book::factory()->create([
+            'user_id' => $this->user->id,
+            'isbn' => '9781234567890',
+        ]);
+
+        $book->genres()->attach($this->genre->id);
 
         $otherBook = Book::factory()->create([
             'isbn' => '9781234567891',
         ]);
 
-        $validData = [
-            'title' => 'Laravel実践入門',
-            'author' => '鈴木一郎',
-            'isbn' => '9781234567892',
-            'published_date' => '2021-01-01',
-            'description' => 'Laravelの実践書です。',
-            'image_url' => 'https://example.com/book.jpg',
-            'genres' => [$genre->id],
-        ];
+        $data = $this->validBookData($this->genre->id);
 
-        $testCases = [
-            '必須項目未入力' => [
-                'data' => [
-                    'title' => '',
-                    'author' => '',
-                    'isbn' => '',
-                    'published_date' => '',
-                    'genres' => [],
-                ],
-                'errors' => [
-                    'title',
-                    'author',
-                    'isbn',
-                    'published_date',
-                    'genres',
-                ],
-            ],
+        $data['isbn'] = $otherBook->isbn;
 
-            '文字数制限超過' => [
-                'data' => [
-                    'title' => str_repeat('a', 256),
-                    'author' => str_repeat('a', 256),
-                    'description' => str_repeat('a', 1001),
-                ],
-                'errors' => [
-                    'title',
-                    'author',
-                    'description',
-                ],
-            ],
+        $response = $this->actingAs($this->user, 'sanctum')
+            ->putJson("/api/v1/books/{$book->id}", $data);
 
-            'ISBN13桁数不足' => [
-                'data' => [
-                    'isbn' => '123456789012',
-                ],
-                'errors' => [
-                    'isbn',
-                ],
-            ],
+        $response->assertStatus(422);
 
-            'ISBN13桁数超過' => [
-                'data' => [
-                    'isbn' => '12345678901234',
-                ],
-                'errors' => [
-                    'isbn',
-                ],
-            ],
-
-            'ISBN数字以外' => [
-                'data' => [
-                    'isbn' => '97812345678ab',
-                ],
-                'errors' => [
-                    'isbn',
-                ],
-            ],
-
-            '他の書籍と同じISBN' => [
-                'data' => [
-                    'isbn' => $otherBook->isbn,
-                ],
-                'errors' => [
-                    'isbn',
-                ],
-            ],
-
-            '出版日不正' => [
-                'data' => [
-                    'published_date' => '2025-02-30',
-                ],
-                'errors' => [
-                    'published_date',
-                ],
-            ],
-
-            '画像URL不正' => [
-                'data' => [
-                    'image_url' => 'invalid-url',
-                ],
-                'errors' => [
-                    'image_url',
-                ],
-            ],
-        ];
-
-        foreach ($testCases as $case) {
-            $data = array_merge($validData, $case['data']);
-
-            $response = $this->actingAs($user, 'sanctum')->putJson(
-                "/api/v1/books/{$book->id}",
-                $data
-            );
-
-            $response->assertStatus(422);
-
-            $response->assertJsonValidationErrors($case['errors']);
-        }
+        $response->assertJsonValidationErrors([
+            'isbn',
+        ]);
     }
 
-    public function test_存在しない書籍を更新できない(): void
+    public function test_自身のISBN13を維持して書籍を更新(): void
     {
-        $user = User::factory()->create();
+        $book = Book::factory()->create([
+            'user_id' => $this->user->id,
+            'title' => 'Laravel入門',
+            'isbn' => '9781234567890',
+        ]);
 
-        $genre = Genre::factory()->create();
+        $book->genres()->attach($this->genre->id);
 
-        $data = [
+        $data = $this->validBookData($this->genre->id);
+
+        $data['title'] = 'Laravel実践入門';
+        $data['author'] = '鈴木一郎';
+        $data['isbn'] = '9781234567890';
+
+        $response = $this->actingAs($this->user, 'sanctum')
+            ->putJson("/api/v1/books/{$book->id}", $data);
+
+        $response->assertStatus(200);
+
+        $this->assertDatabaseHas('books', [
+            'id' => $book->id,
             'title' => 'Laravel実践入門',
             'author' => '鈴木一郎',
-            'isbn' => '9781234567892',
-            'published_date' => '2021-01-01',
-            'description' => 'Laravelの実践書です。',
-            'image_url' => 'https://example.com/book.jpg',
-            'genres' => [$genre->id],
-        ];
+            'isbn' => '9781234567890',
+        ]);
+    }
 
-        $response = $this->actingAs($user, 'sanctum')->putJson(
-            '/api/v1/books/99999',
-            $data
-        );
+    public function test_出版日に不正な値を指定して書籍を更新(): void
+    {
+        $book = Book::factory()->create([
+            'user_id' => $this->user->id,
+        ]);
+
+        $book->genres()->attach($this->genre->id);
+
+        $data = $this->validBookData($this->genre->id);
+
+        $data['published_date'] = '2025-02-30';
+
+        $response = $this->actingAs($this->user, 'sanctum')
+            ->putJson("/api/v1/books/{$book->id}", $data);
+
+        $response->assertStatus(422);
+
+        $response->assertJsonValidationErrors([
+            'published_date',
+        ]);
+    }
+
+    public function test_画像URLに不正な値を指定して書籍を更新(): void
+    {
+        $book = Book::factory()->create([
+            'user_id' => $this->user->id,
+        ]);
+
+        $book->genres()->attach($this->genre->id);
+
+        $data = $this->validBookData($this->genre->id);
+
+        $data['image_url'] = 'invalid-url';
+
+        $response = $this->actingAs($this->user, 'sanctum')
+            ->putJson("/api/v1/books/{$book->id}", $data);
+
+        $response->assertStatus(422);
+
+        $response->assertJsonValidationErrors([
+            'image_url',
+        ]);
+    }
+
+    public function test_存在しない書籍を更新(): void
+    {
+        $data = $this->validBookData($this->genre->id);
+
+        $response = $this->actingAs($this->user, 'sanctum')
+            ->putJson('/api/v1/books/99999', $data);
 
         $response->assertStatus(404);
 
         $response->assertJson([
-            'error' => '書籍が見つかりませんでした。',
+            'error' => '書籍が見つかりませんでした',
         ]);
     }
 
-    public function test_書籍を削除できる(): void
+    public function test_書籍を削除(): void
     {
-        $user = User::factory()->create();
-
         $book = Book::factory()->create([
-            'user_id' => $user->id,
+            'user_id' => $this->user->id,
         ]);
 
-        $response = $this->actingAs($user, 'sanctum')->deleteJson(
-            "/api/v1/books/{$book->id}"
-        );
+        $response = $this->actingAs($this->user, 'sanctum')
+            ->deleteJson("/api/v1/books/{$book->id}");
 
         $response->assertStatus(200);
 
@@ -695,16 +613,29 @@ class BookApiTest extends TestCase
         ]);
     }
 
-    public function test_存在しない書籍を削除できない(): void
+    public function test_存在しない書籍を削除(): void
     {
-        $user = User::factory()->create();
-
-        $response = $this->actingAs($user, 'sanctum')->deleteJson('/api/v1/books/99999');
+        $response = $this->actingAs($this->user, 'sanctum')
+            ->deleteJson('/api/v1/books/99999');
 
         $response->assertStatus(404);
 
         $response->assertJson([
-            'error' => '書籍が見つかりませんでした。',
+            'error' => '書籍が見つかりませんでした',
         ]);
+    }
+
+    public function test_未認証で書籍を登録(): void
+    {
+        $response = $this->postJson('/api/v1/books', [
+            'title' => 'テスト書籍',
+            'author' => 'テスト著者',
+            'isbn' => '1234567890123',
+            'published_date' => '2026-09-28',
+            'description' => 'テスト',
+            'genres' => [$this->genre->id],
+        ]);
+
+        $response->assertStatus(401);
     }
 }

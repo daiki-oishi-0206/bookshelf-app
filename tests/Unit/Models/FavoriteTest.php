@@ -2,19 +2,20 @@
 
 namespace Tests\Unit;
 
-use App\Models\Favorite;
-use Tests\TestCase;
 use App\Models\Book;
+use App\Models\Favorite;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class FavoriteTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * A basic unit test example.
      */
-    public function test_Favoriteモデルが正常に保存できる(): void
+    public function test_Favoriteモデルの正常動作(): void
     {
         $user = User::factory()->create();
         $book = Book::factory()->create();
@@ -29,7 +30,7 @@ class FavoriteTest extends TestCase
         ]);
     }
 
-    public function test_Favoriteモデルのリレーションが正しく取得できる(): void
+    public function test_Favoriteモデルのリレーション(): void
     {
         $user = User::factory()->create();
         $book = Book::factory()->create();

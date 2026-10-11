@@ -2,16 +2,16 @@
 
 namespace Tests\Feature\CRUD;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
-use App\Models\User;
 use App\Models\Book;
 use App\Models\Genre;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class BookPolicyTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * A basic feature test example.
      */
@@ -52,9 +52,8 @@ class BookPolicyTest extends TestCase
             'user_id' => $user->id,
         ]);
 
-
         $response = $this->actingAs($user)->delete("/books/{$book->id}");
-        $response->assertRedirect("/");
+        $response->assertRedirect('/');
     }
 
     public function test_他ユーザーが登録した書籍は更新できない(): void

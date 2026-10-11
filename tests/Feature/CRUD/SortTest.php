@@ -2,15 +2,15 @@
 
 namespace Tests\Feature\CRUD;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
 use App\Models\Book;
 use App\Models\Review;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class SortTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * A basic feature test example.
      */
@@ -20,7 +20,7 @@ class SortTest extends TestCase
             'created_at' => '2021-01-01 11:11:11',
         ]);
         $bookB = Book::factory()->create([
-            'created_at' => '2022-02-02 22:22:22' ,
+            'created_at' => '2022-02-02 22:22:22',
         ]);
 
         $response = $this->get('/?sort=newest');
@@ -39,7 +39,7 @@ class SortTest extends TestCase
             'created_at' => '2021-01-01 11:11:11',
         ]);
         $bookB = Book::factory()->create([
-            'created_at' => '2022-02-02 22:22:22' ,
+            'created_at' => '2022-02-02 22:22:22',
         ]);
 
         $response = $this->get('/?sort=oldest');
@@ -104,5 +104,4 @@ class SortTest extends TestCase
         $response->assertSessionHasErrors('sort');
 
     }
-
 }

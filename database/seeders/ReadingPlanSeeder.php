@@ -2,12 +2,11 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
-use App\Models\User;
 use App\Models\Book;
 use App\Models\ReadingPlan;
+use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Database\Seeder;
 
 class ReadingPlanSeeder extends Seeder
 {
@@ -25,7 +24,7 @@ class ReadingPlanSeeder extends Seeder
             'status' => 'reading',
             'target_date' => Carbon::today()->subDays(1),
         ]);
-        
+
         ReadingPlan::create([
             'user_id' => $users[0]->id,
             'book_id' => $books[1]->id,
@@ -77,4 +76,3 @@ class ReadingPlanSeeder extends Seeder
 
     }
 }
-

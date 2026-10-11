@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\View\View;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Book;
 use App\Models\User;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class FavoriteController extends Controller
 {
@@ -36,7 +35,4 @@ class FavoriteController extends Controller
 
         return back()->with('success', 'お気に入りに追加しました');
     }
-
-
-
 }

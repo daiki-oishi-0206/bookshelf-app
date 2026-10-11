@@ -2,19 +2,19 @@
 
 namespace Tests\Feature\CRUD;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
 use App\Models\Book;
 use App\Models\Review;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class RankingTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * A basic feature test example.
      */
-    public function test_レビュー平均評価のTOP10書籍が降順で表示される(): void
+    public function test_レビュー平均評価の_to_p10書籍が降順で表示される(): void
     {
         $books = Book::factory(11)->create();
 
@@ -69,6 +69,4 @@ class RankingTest extends TestCase
         $response->assertSee('レビューあり');
         $response->assertDontSee('レビューなし');
     }
-
-
 }

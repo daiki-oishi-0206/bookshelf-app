@@ -2,16 +2,17 @@
 
 namespace Tests\Unit\Models;
 
+use App\Enums\ReadingPlanStatus;
+use App\Models\Book;
 use App\Models\ReadingPlan;
 use App\Models\User;
-use App\Models\Book;
-use App\Enums\ReadingPlanStatus;
-use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class ReadingPlanTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * A basic unit test example.
      */
@@ -54,7 +55,6 @@ class ReadingPlanTest extends TestCase
 
         $readingPlans = ReadingPlan::reading()->get();
         $completedPlans = ReadingPlan::completed()->get();
-
 
         $this->assertCount(1, $readingPlans);
         $this->assertEquals(

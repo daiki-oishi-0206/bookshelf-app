@@ -2,15 +2,15 @@
 
 namespace Tests\Feature\API;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
-use App\Models\User;
 use App\Models\Genre;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class SanctumAuthTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * A basic feature test example.
      */
@@ -32,7 +32,7 @@ class SanctumAuthTest extends TestCase
 
         $response = $this->withHeader(
             'Authorization',
-            'Bearer ' . $token
+            'Bearer '.$token
         )->postJson('/api/v1/books', $data);
 
         $response->assertStatus(201);

@@ -2,27 +2,26 @@
 
 namespace Tests\Feature\Access;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
 use App\Models\Genre;
 use App\Models\User;
-
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class GenreTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * A basic feature test example.
      */
-    public function test_未ログインでジャンル一覧画面にアクセスするとログイン画面へリダイレクトされる(): void
+    public function test_未ログインでジャンル管理画面にアクセス(): void
     {
         $response = $this->get('/genres');
 
         $response->assertRedirect('/login');
     }
 
-    public function test_ログイン済みでジャンル一覧画面にアクセスできる(): void
+    public function test_ログイン済みでジャンル管理画面にアクセス(): void
     {
         $user = User::factory()->create();
 
@@ -31,7 +30,7 @@ class GenreTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_未ログインでジャンル詳細画面にアクセスするとログイン画面へリダイレクトされる(): void
+    public function test_未ログインでジャンル詳細画面にアクセス(): void
     {
         $genre = Genre::factory()->create();
 
@@ -40,7 +39,7 @@ class GenreTest extends TestCase
         $response->assertRedirect('/login');
     }
 
-    public function test_ログイン済みでジャンル詳細画面にアクセスできる(): void
+    public function test_ログイン済みでジャンル詳細画面にアクセス(): void
     {
         $user = User::factory()->create();
         $genre = Genre::factory()->create();
@@ -50,14 +49,14 @@ class GenreTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_未ログインでジャンル登録画面にアクセスするとログイン画面へリダイレクトされる(): void
+    public function test_未ログインでジャンル登録画面にアクセス(): void
     {
         $response = $this->get('/genres/create');
 
         $response->assertRedirect('/login');
     }
 
-    public function test_ログイン済みでジャンル登録画面にアクセスできる(): void
+    public function test_ログイン済みでジャンル登録画面にアクセス(): void
     {
         $user = User::factory()->create();
 
@@ -66,7 +65,7 @@ class GenreTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_未ログインでジャンル編集画面にアクセスするとログイン画面へリダイレクトされる(): void
+    public function test_未ログインでジャンル編集画面にアクセス(): void
     {
         $genre = Genre::factory()->create();
 
@@ -75,7 +74,7 @@ class GenreTest extends TestCase
         $response->assertRedirect('/login');
     }
 
-    public function test_ログイン済みでジャンル編集画面にアクセスできる(): void
+    public function test_ログイン済みでジャンル編集画面にアクセス(): void
     {
         $user = User::factory()->create();
         $genre = Genre::factory()->create();

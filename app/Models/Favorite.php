@@ -22,4 +22,3 @@ class Favorite extends Model
         return $this->belongsTo(Book::class);
     }
 }
-

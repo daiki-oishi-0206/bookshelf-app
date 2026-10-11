@@ -2,17 +2,17 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
-use App\Models\User;
 use App\Models\Book;
-use App\Models\Review;
 use App\Models\Genre;
+use App\Models\Review;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class ReadingReportTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * A basic feature test example.
      */
@@ -155,7 +155,6 @@ class ReadingReportTest extends TestCase
             'rating' => 5,
         ]);
 
-
         $response = $this->actingAs($user)->get('/reports');
 
         $response->assertStatus(200);
@@ -201,6 +200,5 @@ class ReadingReportTest extends TestCase
 
         $response->assertSee($bookA->title);
         $response->assertDontSee($bookB->title);
-}
-
+    }
 }

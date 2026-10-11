@@ -2,21 +2,22 @@
 
 namespace Tests\Unit\Models;
 
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\Book;
 use App\Models\Favorite;
 use App\Models\Review;
 use App\Models\ReviewLike;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class UserTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * A basic unit test example.
      */
-    public function test_Userモデルが正常に保存できる(): void
+    public function test_Userモデルの正常動作(): void
     {
         $user = User::factory()->create();
 
@@ -25,7 +26,7 @@ class UserTest extends TestCase
         ]);
     }
 
-    public function test_Userモデルのリレーションが正しく取得できる(): void
+    public function test_Userモデルのリレーション(): void
     {
         $user = User::factory()->create();
         $book = Book::factory()->create([
